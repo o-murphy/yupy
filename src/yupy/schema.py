@@ -1,5 +1,5 @@
 from dataclasses import field, dataclass
-from typing import Any, List, Optional, Generic, TypeVar, Self, Type
+from typing import Any, List, Optional, Generic, TypeVar, Type
 
 from yupy.ischema import ISchema, TransformFunc, ValidatorFunc
 from yupy.locale import locale
@@ -24,20 +24,20 @@ class Schema(Generic[_T], ISchema[_T]):  # Implement ISchema
     def optional(self) -> bool:
         return self._optional
 
-    def required(self, message: ErrorMessage = locale["required"]) -> Self:
+    def required(self, message: ErrorMessage = locale["required"]) -> 'Self':
         self._required: Optional[ErrorMessage] = message
         self._optional: bool = False
         return self
 
-    def not_required(self) -> Self:
+    def not_required(self) -> 'Self':
         self._optional: bool = True
         return self
 
-    def nullable(self) -> Self:
+    def nullable(self) -> 'Self':
         self._nullability: bool = True
         return self
 
-    def not_nullable(self, message: ErrorMessage = locale["not_nullable"]) -> Self:
+    def not_nullable(self, message: ErrorMessage = locale["not_nullable"]) -> 'Self':
         self._nullability: bool = False
         self._not_nullable: ErrorMessage = message
         return self
@@ -57,12 +57,12 @@ class Schema(Generic[_T], ISchema[_T]):  # Implement ISchema
                 Constraint("type", (type_, type(value)), locale["type"])
             )
 
-    def transform(self, func: TransformFunc) -> Self:
+    def transform(self, func: TransformFunc) -> 'Self':
         self._transforms: List[TransformFunc]
         self._transforms.append(func)
         return self
 
-    def test(self, func: ValidatorFunc) -> Self:
+    def test(self, func: ValidatorFunc) -> 'Self':
         self._validators: List[ValidatorFunc]
         self._validators.append(func)
         return self

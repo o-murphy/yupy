@@ -1,6 +1,4 @@
-from typing import Dict, Optional, Literal
-
-from typing_extensions import TypedDict
+from typing import Dict, Optional, Literal, TypedDict
 
 from yupy.validation_error import ErrorMessage
 

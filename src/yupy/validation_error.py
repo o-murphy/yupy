@@ -1,6 +1,5 @@
-import re
 from dataclasses import dataclass, field
-from typing import Generator, Any, List, Self, Optional, Union, Callable, TypeAlias
+from typing import Generator, Any, List, Optional, Union, Callable, TypeAlias
 
 __all__ = (
     'ErrorMessage',
@@ -26,12 +25,12 @@ class Constraint:
 
 class ValidationError(ValueError):
     def __init__(
-            self, constraint: Constraint, path: str = "", errors: Optional[List[Self]] = None, *args
+            self, constraint: Constraint, path: str = "", errors: Optional[List['Self']] = None, *args
     ) -> None:
         # self.path: str = re.sub(r"^\.", "", path)
         self.path = path
         self.constraint: Constraint = constraint
-        self._errors: List[Self] = errors or []
+        self._errors: List['Self'] = errors or []
         super().__init__(self.path, self.constraint, self._errors, *args)
 
     def __str__(self) -> str:
@@ -41,7 +40,7 @@ class ValidationError(ValueError):
         return "ValidationError%s" % self.__str__()
 
     @property
-    def errors(self) -> Generator[Self, None, None]:
+    def errors(self) -> Generator['Self', None, None]:
         yield self
         for error in self._errors:
             yield from error.errors

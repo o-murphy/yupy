@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Self, List, Tuple, TypeVar, Type
+from typing import Any, List, Tuple, TypeVar, Type
 
 from yupy.locale import locale
 from yupy.schema import Schema
@@ -18,7 +18,7 @@ class ArraySchema(Schema[_AT], SizedMixin[_AT]):
     _fields: List[Schema[Any]] = field(init=False, default_factory=list)
     _type_of: Schema[Any] = field(init=False, default_factory=Schema)
 
-    def of(self, schema: Schema[Any], message: ErrorMessage = locale["array_of"]) -> Self:
+    def of(self, schema: Schema[Any], message: ErrorMessage = locale["array_of"]) -> 'Self':
         if not isinstance(schema, Schema):
             raise ValidationError(Constraint("array_of", type(schema), message))
         self._type_of = schema
