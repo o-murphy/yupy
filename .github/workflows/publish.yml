@@ -12,7 +12,8 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: release
+    environment:
+      name: pypi
     permissions:
       id-token: write
 
@@ -29,4 +30,7 @@ jobs:
 
       - name: Build
         run: uv build
+
+      - name: Publish
+        run: uv publish --trusted-publishing always
 
