@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=80.1.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yupy"
+authors = [
+    { name="o-murphy" },
+]
+
+description = "Dead simple Object schema validation for python"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["yup", "json", "python", "python3", "validator", "schema-validator"]
+license = {file = "LICENSE"}
+classifiers = [
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = []
+dynamic = ["version"]
+
+
+[project.urls]
+"Homepage" = "https://github.com/o-murphy/yup"
+"Bug Reports" = "https://github.com/o-murphy/yup/issues"
+"Source" = "https://github.com/o-murphy/yup"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["yup*"]
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
