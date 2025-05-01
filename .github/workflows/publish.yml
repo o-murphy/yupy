@@ -22,8 +22,6 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
-        with:
-          python-version: ".python-version"
 
       - name: Install the project
         run: uv sync --locked --all-extras --dev
@@ -32,5 +30,6 @@ jobs:
         run: uv build
 
       - name: Publish
+        if: github.event_name == 'release'
         run: uv publish --trusted-publishing always
 
