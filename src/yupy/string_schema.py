@@ -2,9 +2,10 @@ import re
 from dataclasses import field, dataclass
 from typing import TypeVar
 
+from yupy.icomparable_schema import ComparableSchema
 from yupy.ischema import _SchemaExpectedType
 from yupy.locale import locale
-from yupy.isized import SizedSchema
+from yupy.isized_schema import SizedSchema
 from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 
 __all__ = ('StringSchema',)
@@ -27,7 +28,7 @@ rUrl_pattern = re.compile(
 _T = TypeVar('_T')
 
 @dataclass
-class StringSchema(SizedSchema[_T]):
+class StringSchema(SizedSchema[_T], ComparableSchema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=str)
     _Self = TypeVar('_Self', bound='StringSchema')
 
@@ -41,21 +42,21 @@ class StringSchema(SizedSchema[_T]):
     def email(self: _Self, message: ErrorMessage = locale["email"]) -> _Self:
         def _(x: str) -> None:
             if not re.match(rEmail_pattern, x):
-                raise ValidationError(Constraint("email", None, message))
+                raise ValidationError(Constraint("email", message), invalid_value=x)
 
         return self.test(_)
 
     def url(self: _Self, message: ErrorMessage = locale["url"]) -> _Self:
         def _(x: str) -> None:
             if not re.match(rUrl_pattern, x):
-                raise ValidationError(Constraint("url", None, message))
+                raise ValidationError(Constraint("url", message), invalid_value=x)
 
         return self.test(_)
 
     def uuid(self: _Self, message: ErrorMessage = locale["uuid"]) -> _Self:
         def _(x: str) -> None:
             if not re.match(rUUID_pattern, x):
-                raise ValidationError(Constraint("uuid", None, message))
+                raise ValidationError(Constraint("uuid", message), invalid_value=x)
 
         return self.test(_)
 
@@ -79,13 +80,13 @@ class StringSchema(SizedSchema[_T]):
     def lowercase(self: _Self, message: ErrorMessage = locale["lowercase"]) -> _Self:
         def _(x: str) -> None:
             if x.lower() != x:
-                raise ValidationError(Constraint("lowercase", None, message))
+                raise ValidationError(Constraint("lowercase", message), invalid_value=x)
 
         return self.test(_)
 
     def uppercase(self: _Self, message: ErrorMessage = locale["uppercase"]) -> _Self:
         def _(x: str) -> None:
             if x.upper() != x:
-                raise ValidationError(Constraint("uppercase", None, message))
+                raise ValidationError(Constraint("uppercase", message), invalid_value=x)
 
         return self.test(_)

@@ -10,6 +10,7 @@ __all__ = ('MixedSchema',)
 
 _T = TypeVar('_T')
 
+
 @dataclass
 class MixedSchema(Schema[_T]):
     _type: _SchemaExpectedType = field(default=object)
@@ -22,12 +23,6 @@ class MixedSchema(Schema[_T]):
 
         def _(x: Any) -> None:
             if x not in items:
-                raise ValidationError(
-                    Constraint(
-                        'one_of',
-                        items,
-                        message
-                    )
-                )
+                raise ValidationError(Constraint('one_of', message, items), invalid_value=x)
 
         return self.test(_)

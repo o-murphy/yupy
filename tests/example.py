@@ -1,6 +1,5 @@
 from yupy import mapping, array, string, number, mixed, ValidationError, Constraint
 
-
 _schema = mapping().shape({
     'profile': mapping().shape({
         # descriptor
@@ -59,27 +58,29 @@ _schema = mapping().shape({
 })
 
 
-def _corf_rows_mv_test(rows):
-    if not rows:
-        raise ValidationError(
-            Constraint(
-                'unique_mv',
-                None,
-                'Coefficient rows must not be empty'
+class _CoefRowsMvValidator:
+    def __call__(self, rows):
+        if not rows:
+            raise ValidationError(
+                Constraint(
+                    'unique_mv',
+                    'Coefficient rows must not be empty'
+                ),
+                invalid_value=rows
             )
-        )
-    mv_values = map(lambda x: x['mv'], rows)
-    filtered = tuple(filter(lambda mv: mv != 0, mv_values))
-    unique = set(filtered)
-    if len(unique) != len(filtered):
-        raise ValidationError(
-            Constraint(
-                'unique_mv',
-                None,
-                "'mv' values must be unique, except for mv == 0"
+        mv_values = map(lambda x: x['mv'], rows)
+        filtered = tuple(filter(lambda mv: mv != 0, mv_values))
+        unique = set(filtered)
+        if len(unique) != len(filtered):
+            raise ValidationError(
+                Constraint(
+                    'unique_mv',
+                    "'mv' values must be unique, except for mv == 0"
+                ),
+                invalid_value=rows
             )
-        )
 
+_coef_rows_mv_validator = _CoefRowsMvValidator()
 
 _coef_rows_std_schema = array().of(
     mapping().shape({
@@ -88,7 +89,7 @@ _coef_rows_std_schema = array().of(
     })
 ).min(1).max(5).required(
     'For G1 or G7, coefRows must contain between 1 and 5 items'
-).test(_corf_rows_mv_test)
+).test(_coef_rows_mv_validator)
 
 _coef_rows_custom_schema = array().of(
     mapping().shape({
@@ -97,5 +98,4 @@ _coef_rows_custom_schema = array().of(
     })
 ).min(1).max(200).required(
     'For CUSTOM, coefRows must contain between 1 and 200 items'
-).test(_corf_rows_mv_test)
-
+).test(_coef_rows_mv_validator)

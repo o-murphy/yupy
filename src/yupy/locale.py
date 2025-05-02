@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Literal, TypedDict
+from typing import Optional, Literal, TypedDict
 
 from yupy.validation_error import ErrorMessage
 
@@ -34,16 +34,15 @@ class Locale(TypedDict, total=False):
     shape: ErrorMessage
     shape_values: ErrorMessage
     one_of: ErrorMessage
+    undefined: ErrorMessage
 
 
 LocaleKey = Literal[
     "type", "min", "max", "length", "required", "not_nullable", "test", "matches",
     "email", "url", "uuid", "lowercase", "uppercase", "le", "ge", "lt", "gt",
     "integer", "multiple_of", "positive", "negative", "array_of", "shape",
-    "shape_values", "one_of"
+    "shape_values", "one_of", "undefined"
 ]
-
-# PartialLocale = Optional[Dict[LocaleKey], ErrorMessage]
 
 locale: Locale = {
     "type": lambda args: "Value is not of type %r, got %r" % args,
@@ -70,17 +69,16 @@ locale: Locale = {
     "multiple_of": lambda args: "Value must be a multiple of %r" % args,
     "shape": "'shape' must be a type of 'Shape'",
     "shape_values": "all shape items must have a values of type of Schema",
-    "one_of": lambda args: "Must be one of %r" % args
+    "one_of": lambda args: "Must be one of %r" % args,
+    "undefined": "undefined validation error"
 }
 
 
 def set_locale(locale_: Optional[Locale] = None) -> Locale:
     if locale_:
-        locale.update({
-            **locale,
-            **locale_
-        })
+        locale.update(locale_)
     return locale
+
 
 def get_error_message(key: LocaleKey) -> ErrorMessage:
     return locale.get(key, "undefined")

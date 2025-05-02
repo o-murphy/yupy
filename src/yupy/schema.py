@@ -20,7 +20,7 @@ class Schema(Generic[_S]):  # Implement ISchema
     _nullability: bool = False
     _not_nullable: ErrorMessage = locale["not_nullable"]
 
-    _Self = TypeVar('_Self', bound='Schema[_S]')
+    _Self = TypeVar('_Self', bound='Schema')
 
     @property
     def optional(self) -> bool:
@@ -44,10 +44,11 @@ class Schema(Generic[_S]):  # Implement ISchema
         self._not_nullable: ErrorMessage = message
         return self
 
-    def _nullable_check(self: _Self) -> None:
+    def _nullable_check(self: _Self, value: Any) -> None:
         if not self._nullability:
             raise ValidationError(
-                Constraint("nullable", None, self._not_nullable),
+                Constraint("nullable", self._not_nullable),
+                invalid_value=value
             )
 
     def _type_check(self: _Self, value: Any) -> None:
@@ -56,7 +57,8 @@ class Schema(Generic[_S]):  # Implement ISchema
             return
         if not isinstance(value, type_):
             raise ValidationError(
-                Constraint("type", (type_, type(value)), locale["type"])
+                Constraint("type", locale["type"], type_, type(value)),
+                invalid_value=value
             )
 
     def transform(self: _Self, func: TransformFunc) -> _Self:
@@ -65,24 +67,27 @@ class Schema(Generic[_S]):  # Implement ISchema
         return self
 
     def test(self: _Self, func: ValidatorFunc) -> _Self:
-        self._validators: List[ValidatorFunc]
         self._validators.append(func)
         return self
+
+    def _transform(self: _Self, value: Any) -> Any:
+        transformed: Any = value
+        for t in self._transforms:
+            transformed = t(transformed)
+        return transformed
 
     def validate(self: _Self, value: Any, abort_early: bool = True, path: str = "") -> Any:
         try:
             if value is None:
-                self._nullable_check()
+                self._nullable_check(value)
                 return value
 
             self._type_check(value)
 
-            transformed: Any = value
-            for t in self._transforms:
-                transformed = t(transformed)
+            transformed = self._transform(value)
 
             for v in self._validators:
                 v(transformed)
             return transformed
         except ValidationError as err:
-            raise ValidationError(err.constraint, path)
+            raise ValidationError(err.constraint, path, invalid_value=value)

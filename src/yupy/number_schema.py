@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Union, TypeAlias, TypeVar
 
-from yupy.icomparable import ComparableSchema
-from yupy.locale import locale
+from yupy.icomparable_schema import ComparableSchema
 from yupy.ischema import _SchemaExpectedType
+from yupy.locale import locale
 from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 
 __all__ = ('NumberSchema',)
@@ -26,7 +26,7 @@ class NumberSchema(ComparableSchema[_T]):
     def integer(self: _Self, message: ErrorMessage = locale["integer"]) -> _Self:
         def _(x: _NumberType) -> None:
             if (x % 1) != 0:
-                raise ValidationError(Constraint("integer", None, message))
+                raise ValidationError(Constraint("integer", message), invalid_value=x)
 
         return self.test(_)
 
@@ -40,6 +40,6 @@ class NumberSchema(ComparableSchema[_T]):
                     message: ErrorMessage = locale["multiple_of"]) -> _Self:
         def _(x: Union[int, float]) -> None:
             if x % multiplier != 0:
-                raise ValidationError(Constraint("multiple_of", multiplier, message))
+                raise ValidationError(Constraint("multiple_of", message, multiplier), invalid_value=x)
 
         return self.test(_)

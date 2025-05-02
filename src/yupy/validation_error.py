@@ -7,14 +7,25 @@ __all__ = (
     'Constraint',
 )
 
+
 ErrorMessage: TypeAlias = Union[str, Callable[[Any | List[Any]], str]]
 
 
 @dataclass
 class Constraint:
-    type: Optional[str]
-    args: Any
-    message: ErrorMessage = field(repr=False)
+
+    def __init__(self,
+        type: Optional[str],
+        message: Optional[ErrorMessage] = None,
+        *args: Any,
+    ):
+        self.type = type
+        self.args = args
+        if not message:
+            from yupy.locale import get_error_message
+            self.message = get_error_message("undefined")
+        else:
+            self.message = message
 
     @property
     def format_message(self) -> str:
@@ -25,12 +36,14 @@ class Constraint:
 
 class ValidationError(ValueError):
     def __init__(
-            self, constraint: Constraint, path: str = "",
+            self, constraint: Optional[Constraint] = None, path: str = "",
             errors: Optional[List['ValidationError']] = None,
             invalid_value: Optional[Any] = None, *args) -> None:
-        # self.path: str = re.sub(r"^\.", "", path)
+        if not constraint:
+            self.constraint = Constraint("undefined")
+        else:
+            self.constraint = constraint
         self.path = path
-        self.constraint: Constraint = constraint
         self._errors: List[ValidationError] = errors or []
         self.invalid_value: Optional[Any] = invalid_value
         super().__init__(self.path, self.constraint, self._errors, *args)
