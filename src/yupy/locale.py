@@ -8,7 +8,7 @@ __all__ = (
 )
 
 
-class Locale(TypedDict, ):
+class Locale(TypedDict, total=False):
     type: ErrorMessage
     min: ErrorMessage
     max: ErrorMessage
@@ -36,12 +36,14 @@ class Locale(TypedDict, ):
     one_of: ErrorMessage
 
 
-PartialLocale = Optional[Dict[Literal[
+LocaleKey = Literal[
     "type", "min", "max", "length", "required", "not_nullable", "test", "matches",
     "email", "url", "uuid", "lowercase", "uppercase", "le", "ge", "lt", "gt",
     "integer", "multiple_of", "positive", "negative", "array_of", "shape",
     "shape_values", "one_of"
-], ErrorMessage]]
+]
+
+# PartialLocale = Optional[Dict[LocaleKey], ErrorMessage]
 
 locale: Locale = {
     "type": lambda args: "Value is not of type %r, got %r" % args,
@@ -53,7 +55,7 @@ locale: Locale = {
     "required": "Field is required",
     "not_nullable": "Value can't be null",
     "test": "Test failed",
-    # 'matches':
+    'matches': "Don't match regex",  # FIXME
     "email": "Value must be a valid email",
     "url": "Value must be a valid URL",
     "uuid": "Value must be a valid UUID",
@@ -72,7 +74,13 @@ locale: Locale = {
 }
 
 
-def set_locale(locale_: PartialLocale = None) -> Locale:
+def set_locale(locale_: Optional[Locale] = None) -> Locale:
     if locale_:
-        locale.update(locale_)
+        locale.update({
+            **locale,
+            **locale_
+        })
     return locale
+
+def get_error_message(key: LocaleKey) -> ErrorMessage:
+    return locale.get(key, "undefined")

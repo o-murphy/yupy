@@ -41,3 +41,8 @@ include = ["yupy*"]
 
 [tool.setuptools.dynamic]
 version = {file = "VERSION"}
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+]

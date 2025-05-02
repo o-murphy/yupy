@@ -25,12 +25,14 @@ class Constraint:
 
 class ValidationError(ValueError):
     def __init__(
-            self, constraint: Constraint, path: str = "", errors: Optional[List['Self']] = None, *args
-    ) -> None:
+            self, constraint: Constraint, path: str = "",
+            errors: Optional[List['ValidationError']] = None,
+            invalid_value: Optional[Any] = None, *args) -> None:
         # self.path: str = re.sub(r"^\.", "", path)
         self.path = path
         self.constraint: Constraint = constraint
-        self._errors: List['Self'] = errors or []
+        self._errors: List[ValidationError] = errors or []
+        self.invalid_value: Optional[Any] = invalid_value
         super().__init__(self.path, self.constraint, self._errors, *args)
 
     def __str__(self) -> str:
@@ -40,7 +42,7 @@ class ValidationError(ValueError):
         return "ValidationError%s" % self.__str__()
 
     @property
-    def errors(self) -> Generator['Self', None, None]:
+    def errors(self) -> Generator['ValidationError', None, None]:
         yield self
         for error in self._errors:
             yield from error.errors
@@ -50,6 +52,6 @@ class ValidationError(ValueError):
         return f"{repr(self.path)}: {self.constraint.format_message}"
 
     @property
-    def messages(self) -> Generator[str, None, None]:
+    def messages(self) -> Generator[Union[property, str], None, None]:
         for e in self.errors:
             yield e.message

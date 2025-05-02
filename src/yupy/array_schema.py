@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Any, List, Tuple, TypeVar, Type
+from typing import Any, List, Tuple, TypeVar, Union
 
 from yupy.locale import locale
+from yupy.ischema import _SchemaExpectedType
 from yupy.schema import Schema
 from yupy.sized_mixin import SizedMixin
 from yupy.util.concat_path import concat_path
@@ -14,22 +15,22 @@ _AT = TypeVar('_AT', List[Any], Tuple[Any, ...])
 
 @dataclass
 class ArraySchema(Schema[_AT], SizedMixin[_AT]):
-    _type: Type[Tuple[Type[list], Type[tuple]]] = field(init=False, default=(list, tuple))
+    _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
     _fields: List[Schema[Any]] = field(init=False, default_factory=list)
     _type_of: Schema[Any] = field(init=False, default_factory=Schema)
 
-    def of(self, schema: Schema[Any], message: ErrorMessage = locale["array_of"]) -> 'Self':
+    def of(self, schema: Schema[Any], message: ErrorMessage = locale["array_of"]) -> 'Schema[_AT]':
         if not isinstance(schema, Schema):
             raise ValidationError(Constraint("array_of", type(schema), message))
         self._type_of = schema
         return self
 
-    def validate(self, value: _AT, abort_early: bool = True, path: str = "") -> _AT:
+    def validate(self, value: Any, abort_early: bool = True, path: str = "") -> Any:
         super().validate(value, abort_early, path)
         self._validate_array(list(value), abort_early, path)  # Convert tuple to list for iteration
         return value
 
-    def _validate_array(self, value: List[Any], abort_early: bool = True, path: str = "") -> None:
+    def _validate_array(self, value: Union[List[Any], Tuple[Any, ...]], abort_early: bool = True, path: str = "") -> None:
         errs: List[ValidationError] = []
         for i, v in enumerate(value):
             path_ = concat_path(path, i)
