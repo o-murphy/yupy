@@ -15,14 +15,15 @@ _NumberType: TypeAlias = Union[int, float]
 @dataclass
 class NumberSchema(ComparableSchema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=(float, int))
+    _Self = TypeVar('_Self', bound='NumberSchema')
 
-    def positive(self, message: ErrorMessage = locale["positive"]) -> _T:
+    def positive(self: _Self, message: ErrorMessage = locale["positive"]) -> _Self:
         return self.gt(0, message)
 
-    def negative(self, message: ErrorMessage = locale["negative"]) -> _T:
+    def negative(self: _Self, message: ErrorMessage = locale["negative"]) -> _Self:
         return self.lt(0, message)
 
-    def integer(self, message: ErrorMessage = locale["integer"]) -> _T:
+    def integer(self: _Self, message: ErrorMessage = locale["integer"]) -> _Self:
         def _(x: _NumberType) -> None:
             if (x % 1) != 0:
                 raise ValidationError(Constraint("integer", None, message))
@@ -35,8 +36,8 @@ class NumberSchema(ComparableSchema[_T]):
     # def round(self, method: Literal['ceil', 'floor', 'round', 'trunc']) -> 'NumberSchema':
     #     self._transforms
 
-    def multiple_of(self, multiplier: Union[int, float],
-                    message: ErrorMessage = locale["multiple_of"]) -> _T:
+    def multiple_of(self: _Self, multiplier: Union[int, float],
+                    message: ErrorMessage = locale["multiple_of"]) -> _Self:
         def _(x: Union[int, float]) -> None:
             if x % multiplier != 0:
                 raise ValidationError(Constraint("multiple_of", multiplier, message))

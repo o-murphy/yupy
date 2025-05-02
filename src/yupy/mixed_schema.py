@@ -13,8 +13,9 @@ _T = TypeVar('_T')
 @dataclass
 class MixedSchema(Schema[_T]):
     _type: _SchemaExpectedType = field(default=object)
+    _Self = TypeVar('_Self', bound='MixedSchema')
 
-    def one_of(self, items: Iterable, message: ErrorMessage = locale['one_of']) -> _T:
+    def one_of(self: _Self, items: Iterable, message: ErrorMessage = locale['one_of']) -> _Self:
         """
         Adds a validation to check if the value is one of the provided items.
         """

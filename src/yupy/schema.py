@@ -20,35 +20,37 @@ class Schema(Generic[_S]):  # Implement ISchema
     _nullability: bool = False
     _not_nullable: ErrorMessage = locale["not_nullable"]
 
+    _Self = TypeVar('_Self', bound='Schema[_S]')
+
     @property
     def optional(self) -> bool:
         return self._optional
 
-    def required(self, message: ErrorMessage = locale["required"]) -> _S:
+    def required(self: _Self, message: ErrorMessage = locale["required"]) -> _Self:
         self._required: ErrorMessage = message
         self._optional: bool = False
         return self
 
-    def not_required(self) -> _S:
+    def not_required(self: _Self) -> _Self:
         self._optional: bool = True
         return self
 
-    def nullable(self) -> _S:
+    def nullable(self: _Self) -> _Self:
         self._nullability: bool = True
         return self
 
-    def not_nullable(self, message: ErrorMessage = locale["not_nullable"]) -> _S:
+    def not_nullable(self: _Self, message: ErrorMessage = locale["not_nullable"]) -> _Self:
         self._nullability: bool = False
         self._not_nullable: ErrorMessage = message
         return self
 
-    def _nullable_check(self) -> None:
+    def _nullable_check(self: _Self) -> None:
         if not self._nullability:
             raise ValidationError(
                 Constraint("nullable", None, self._not_nullable),
             )
 
-    def _type_check(self, value: Any) -> None:
+    def _type_check(self: _Self, value: Any) -> None:
         type_ = self._type
         if type_ is Any:
             return
@@ -57,17 +59,17 @@ class Schema(Generic[_S]):  # Implement ISchema
                 Constraint("type", (type_, type(value)), locale["type"])
             )
 
-    def transform(self, func: TransformFunc) -> _S:
+    def transform(self: _Self, func: TransformFunc) -> _Self:
         self._transforms: List[TransformFunc]
         self._transforms.append(func)
         return self
 
-    def test(self, func: ValidatorFunc) -> _S:
+    def test(self: _Self, func: ValidatorFunc) -> _Self:
         self._validators: List[ValidatorFunc]
         self._validators.append(func)
         return self
 
-    def validate(self, value: Any, abort_early: bool = True, path: str = "") -> Any:
+    def validate(self: _Self, value: Any, abort_early: bool = True, path: str = "") -> Any:
         try:
             if value is None:
                 self._nullable_check()

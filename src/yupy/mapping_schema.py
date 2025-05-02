@@ -16,8 +16,9 @@ Shape: TypeAlias = Mapping[str, Schema[Any]]
 class MappingSchema(Schema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=dict)
     _fields: Mapping[str, Schema[Any]] = field(init=False, default_factory=dict)
+    _Self = TypeVar('_Self', bound='MappingSchema')
 
-    def shape(self, fields: Shape) -> 'MappingSchema':
+    def shape(self: _Self, fields: Shape) -> _Self:
         if not isinstance(fields, dict):  # Перевірка залишається на dict, оскільки shape визначається через dict
             raise ValidationError(
                 Constraint("shape", None, locale["shape"])

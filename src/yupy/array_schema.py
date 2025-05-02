@@ -18,8 +18,9 @@ class ArraySchema(SizedSchema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
     _fields: List[Schema[Any]] = field(init=False, default_factory=list)
     _type_of: Schema[Any] = field(init=False, default_factory=Schema)
+    _Self = TypeVar('_Self', bound='ArraySchema')
 
-    def of(self, schema: Schema[Any], message: ErrorMessage = locale["array_of"]) -> 'ArraySchema':
+    def of(self: _Self, schema: Schema[Any], message: ErrorMessage = locale["array_of"]) -> _Self:
         if not isinstance(schema, Schema):
             raise ValidationError(Constraint("array_of", type(schema), message))
         self._type_of = schema

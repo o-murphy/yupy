@@ -21,29 +21,30 @@ class IComparable(Protocol[_P]):
 
 
 class ComparableSchema(Schema[_S]):
+    _Self = TypeVar('_Self', bound='ComparableSchema')
 
-    def le(self, limit: Any, message: ErrorMessage = locale["le"]) -> _S:
+    def le(self: _Self, limit: Any, message: ErrorMessage = locale["le"]) -> _Self:
         def _(x: Any) -> None:
             if x > limit:
                 raise ValidationError(Constraint("le", limit, message))
 
         return self.test(_)
 
-    def ge(self, limit: Any, message: ErrorMessage = locale["ge"]) -> _S:
+    def ge(self: _Self, limit: Any, message: ErrorMessage = locale["ge"]) -> _Self:
         def _(x: Any) -> None:
             if x < limit:
                 raise ValidationError(Constraint("ge", limit, message))
 
         return self.test(_)
 
-    def lt(self, limit: Any, message: ErrorMessage = locale["lt"]) -> _S:
+    def lt(self: _Self, limit: Any, message: ErrorMessage = locale["lt"]) -> _Self:
         def _(x: Any) -> None:
             if x >= limit:
                 raise ValidationError(Constraint("lt", limit, message))
 
         return self.test(_)
 
-    def gt(self, limit: Any, message: ErrorMessage = locale["gt"]) -> _S:
+    def gt(self: _Self, limit: Any, message: ErrorMessage = locale["gt"]) -> _Self:
         def _(x: Any) -> None:
             if x <= limit:
                 raise ValidationError(Constraint("gt", limit, message))
