@@ -1,4 +1,4 @@
-from .sized_mixin import *
+# from .sized_mixin import *
 from .array_schema import *
 from .locale import *
 from .mixed_schema import *
@@ -25,7 +25,7 @@ __all__ = (
     'ArraySchema',
     'MixedSchema',
 
-    'SizedMixin',
+    # 'SizedMixin',
 
     'string',
     'number',

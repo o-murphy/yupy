@@ -1,17 +1,17 @@
 from dataclasses import field, dataclass
 from typing import Any, List, TypeVar, Generic
 
-from yupy.ischema import ISchema, TransformFunc, ValidatorFunc, _SchemaExpectedType
+from yupy.ischema import TransformFunc, ValidatorFunc, _SchemaExpectedType
 from yupy.locale import locale
 from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 
 __all__ = ('Schema',)
 
-_T = TypeVar('_T')
+_S = TypeVar('_S')
 
 
 @dataclass
-class Schema(ISchema[_T], Generic[_T]):  # Implement ISchema
+class Schema(Generic[_S]):  # Implement ISchema
     _type: _SchemaExpectedType = field(default=object)
     _transforms: List[TransformFunc] = field(init=False, default_factory=list)
     _validators: List[ValidatorFunc] = field(init=False, default_factory=list)
@@ -24,20 +24,20 @@ class Schema(ISchema[_T], Generic[_T]):  # Implement ISchema
     def optional(self) -> bool:
         return self._optional
 
-    def required(self, message: ErrorMessage = locale["required"]) -> 'Schema':
+    def required(self, message: ErrorMessage = locale["required"]) -> _S:
         self._required: ErrorMessage = message
         self._optional: bool = False
         return self
 
-    def not_required(self) -> 'Schema':
+    def not_required(self) -> _S:
         self._optional: bool = True
         return self
 
-    def nullable(self) -> 'Schema':
+    def nullable(self) -> _S:
         self._nullability: bool = True
         return self
 
-    def not_nullable(self, message: ErrorMessage = locale["not_nullable"]) -> 'Schema':
+    def not_nullable(self, message: ErrorMessage = locale["not_nullable"]) -> _S:
         self._nullability: bool = False
         self._not_nullable: ErrorMessage = message
         return self
@@ -57,17 +57,17 @@ class Schema(ISchema[_T], Generic[_T]):  # Implement ISchema
                 Constraint("type", (type_, type(value)), locale["type"])
             )
 
-    def transform(self, func: TransformFunc) -> 'Schema':
+    def transform(self, func: TransformFunc) -> _S:
         self._transforms: List[TransformFunc]
         self._transforms.append(func)
         return self
 
-    def test(self, func: ValidatorFunc) -> 'Schema':
+    def test(self, func: ValidatorFunc) -> _S:
         self._validators: List[ValidatorFunc]
         self._validators.append(func)
         return self
 
-    def validate(self, value: _T, abort_early: bool = True, path: str = "") -> _T:
+    def validate(self, value: Any, abort_early: bool = True, path: str = "") -> Any:
         try:
             if value is None:
                 self._nullable_check()
@@ -75,7 +75,7 @@ class Schema(ISchema[_T], Generic[_T]):  # Implement ISchema
 
             self._type_check(value)
 
-            transformed: _T = value
+            transformed: Any = value
             for t in self._transforms:
                 transformed = t(transformed)
 

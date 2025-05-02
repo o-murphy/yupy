@@ -1,25 +1,25 @@
 from dataclasses import dataclass, field
 from typing import Any, List, Tuple, TypeVar, Union
 
-from yupy.locale import locale
 from yupy.ischema import _SchemaExpectedType
+from yupy.isized import SizedSchema
+from yupy.locale import locale
 from yupy.schema import Schema
-from yupy.sized_mixin import SizedMixin
 from yupy.util.concat_path import concat_path
 from yupy.validation_error import ErrorMessage, Constraint, ValidationError
 
 __all__ = ('ArraySchema',)
 
-_AT = TypeVar('_AT', List[Any], Tuple[Any, ...])
+_T = TypeVar('_T')
 
 
 @dataclass
-class ArraySchema(Schema[_AT], SizedMixin[_AT]):
+class ArraySchema(SizedSchema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
     _fields: List[Schema[Any]] = field(init=False, default_factory=list)
     _type_of: Schema[Any] = field(init=False, default_factory=Schema)
 
-    def of(self, schema: Schema[Any], message: ErrorMessage = locale["array_of"]) -> 'Schema[_AT]':
+    def of(self, schema: Schema[Any], message: ErrorMessage = locale["array_of"]) -> 'ArraySchema':
         if not isinstance(schema, Schema):
             raise ValidationError(Constraint("array_of", type(schema), message))
         self._type_of = schema
@@ -30,7 +30,8 @@ class ArraySchema(Schema[_AT], SizedMixin[_AT]):
         self._validate_array(list(value), abort_early, path)  # Convert tuple to list for iteration
         return value
 
-    def _validate_array(self, value: Union[List[Any], Tuple[Any, ...]], abort_early: bool = True, path: str = "") -> None:
+    def _validate_array(self, value: Union[List[Any], Tuple[Any, ...]], abort_early: bool = True,
+                        path: str = "") -> None:
         errs: List[ValidationError] = []
         for i, v in enumerate(value):
             path_ = concat_path(path, i)

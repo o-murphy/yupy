@@ -3,16 +3,14 @@ from typing import Protocol, TypeVar, Callable, Any, TypeAlias
 
 from yupy.validation_error import ErrorMessage
 
-_T = TypeVar('_T')
+_P = TypeVar('_P', covariant=True)
 _SchemaExpectedType: TypeAlias = type | UnionType | tuple[Any, ...]
-# _SchemaExpectedType = TypeVar('_SchemaExpectedType', type, UnionType, tuple[Any, ...])
-
 
 TransformFunc = Callable[[Any], Any]
-ValidatorFunc = Callable[[_T], _T]
+ValidatorFunc = Callable[[_P], _P]
 
 
-class ISchema(Protocol[_T]):
+class ISchema(Protocol[_P]):
     _type: _SchemaExpectedType
     _transforms: list[TransformFunc]
     _validators: list[ValidatorFunc]
@@ -36,4 +34,4 @@ class ISchema(Protocol[_T]):
 
     def test(self, func: ValidatorFunc) -> 'ISchema': ...
 
-    def validate(self, value: _T, abort_early: bool = True, path: str = "") -> _T: ...
+    def validate(self, value: Any, abort_early: bool = True, path: str = "") -> Any: ...

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any, Iterable, TypeVar
 
 from yupy.ischema import _SchemaExpectedType
 from yupy.locale import locale
@@ -8,12 +8,13 @@ from yupy.validation_error import ErrorMessage, Constraint, ValidationError
 
 __all__ = ('MixedSchema',)
 
+_T = TypeVar('_T')
 
 @dataclass
-class MixedSchema(Schema[Any]):
+class MixedSchema(Schema[_T]):
     _type: _SchemaExpectedType = field(default=object)
 
-    def one_of(self, items: Iterable, message: ErrorMessage = locale['one_of']) -> 'Schema[Any]':
+    def one_of(self, items: Iterable, message: ErrorMessage = locale['one_of']) -> _T:
         """
         Adds a validation to check if the value is one of the provided items.
         """

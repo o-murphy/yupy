@@ -1,10 +1,10 @@
 import re
 from dataclasses import field, dataclass
+from typing import TypeVar
 
 from yupy.ischema import _SchemaExpectedType
 from yupy.locale import locale
-from yupy.schema import Schema
-from yupy.sized_mixin import SizedMixin
+from yupy.isized import SizedSchema
 from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 
 __all__ = ('StringSchema',)
@@ -24,9 +24,10 @@ rUrl_pattern = re.compile(
     re.IGNORECASE,
 )
 
+_T = TypeVar('_T')
 
 @dataclass
-class StringSchema(Schema[str], SizedMixin[str]):
+class StringSchema(SizedSchema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=str)
 
     # def matches(self, regex: re.Pattern, message: ErrorMessage, exclude_empty: bool = False) -> Schema:
@@ -36,21 +37,21 @@ class StringSchema(Schema[str], SizedMixin[str]):
     #     self._validators.append(_)
     #     return self
 
-    def email(self, message: ErrorMessage = locale["email"]) -> 'Schema[str]':
+    def email(self, message: ErrorMessage = locale["email"]) -> _T:
         def _(x: str) -> None:
             if not re.match(rEmail_pattern, x):
                 raise ValidationError(Constraint("email", None, message))
 
         return self.test(_)
 
-    def url(self, message: ErrorMessage = locale["url"]) -> 'Schema[str]':
+    def url(self, message: ErrorMessage = locale["url"]) -> _T:
         def _(x: str) -> None:
             if not re.match(rUrl_pattern, x):
                 raise ValidationError(Constraint("url", None, message))
 
         return self.test(_)
 
-    def uuid(self, message: ErrorMessage = locale["uuid"]) -> 'Schema[str]':
+    def uuid(self, message: ErrorMessage = locale["uuid"]) -> _T:
         def _(x: str) -> None:
             if not re.match(rUUID_pattern, x):
                 raise ValidationError(Constraint("uuid", None, message))
@@ -64,7 +65,7 @@ class StringSchema(Schema[str], SizedMixin[str]):
     #     self._validators.append(_)
     #     return self
 
-    def ensure(self) -> 'Schema[str]':
+    def ensure(self) -> 'StringSchema[_T]':
         def _(x: str) -> str:
             return x if x else ""
 
@@ -74,14 +75,14 @@ class StringSchema(Schema[str], SizedMixin[str]):
     # def trim(self, message: ErrorMessage):
     #     ...
 
-    def lowercase(self, message: ErrorMessage = locale["lowercase"]) -> 'Schema[str]':
+    def lowercase(self, message: ErrorMessage = locale["lowercase"]) -> _T:
         def _(x: str) -> None:
             if x.lower() != x:
                 raise ValidationError(Constraint("lowercase", None, message))
 
         return self.test(_)
 
-    def uppercase(self, message: ErrorMessage = locale["uppercase"]) -> 'Schema[str]':
+    def uppercase(self, message: ErrorMessage = locale["uppercase"]) -> _T:
         def _(x: str) -> None:
             if x.upper() != x:
                 raise ValidationError(Constraint("uppercase", None, message))
