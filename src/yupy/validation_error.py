@@ -13,6 +13,9 @@ ErrorMessage: TypeAlias = Union[str, Callable[[Any | List[Any]], str]]
 
 @dataclass
 class Constraint:
+    type: str
+    args: Any
+    message: ErrorMessage = field(repr=False)
 
     def __init__(self,
         type: Optional[str],
