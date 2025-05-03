@@ -64,4 +64,4 @@ if __name__ == "__main__":
             ...
 
     from timeit import timeit
-    print(timeit(check, number=10000))
+    print(timeit(check, number=100000))

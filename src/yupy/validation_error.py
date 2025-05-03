@@ -53,7 +53,7 @@ class ValidationError(ValueError):
         super().__init__(self.path, self.constraint, self._errors, *args)
 
     def __str__(self) -> str:
-        return f"(path={repr(self.path)}, constraint={self.constraint}, message={repr(self.constraint.format_message)})"
+        return "(path=%r, constraint=%r, message=%r)" % (self.path, self.constraint, self.constraint.format_message)
 
     def __repr__(self) -> str:
         return "ValidationError%s" % self.__str__()
@@ -66,7 +66,7 @@ class ValidationError(ValueError):
 
     @property
     def message(self) -> str:
-        return f"{repr(self.path)}: {self.constraint.format_message}"
+        return "%r:%s" % (self.path, self.constraint.format_message)
 
     @property
     def messages(self) -> Generator[Union[property, str], None, None]:
