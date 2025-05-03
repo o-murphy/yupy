@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any, Mapping, TypeVar, TypeAlias
 
+from typing_extensions import Self
+
 from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.locale import locale
 from yupy.schema import Schema
@@ -10,16 +12,15 @@ from yupy.validation_error import ValidationError, Constraint
 __all__ = ('MappingSchema',)
 
 _T = TypeVar('_T')
-Shape: TypeAlias = Mapping[str, ISchema[Any]]
+_SchemaShape: TypeAlias = Mapping[str, ISchema[Any]]
 
 
 @dataclass
 class MappingSchema(Schema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=dict)
     _fields: Mapping[str, Schema[Any]] = field(init=False, default_factory=dict)
-    _Self = TypeVar('_Self', bound='MappingSchema')
 
-    def shape(self: _Self, fields: Shape) -> _Self:
+    def shape(self, fields: _SchemaShape) -> Self:
         if not isinstance(fields, dict):  # Перевірка залишається на dict, оскільки shape визначається через dict
             raise ValidationError(
                 Constraint("shape", locale["shape"])

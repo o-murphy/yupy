@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Union, TypeAlias, TypeVar
 
+from typing_extensions import Self
+
 from yupy.icomparable_schema import ComparableSchema
 from yupy.ischema import _SchemaExpectedType
 from yupy.locale import locale
@@ -15,15 +17,14 @@ _NumberType: TypeAlias = Union[int, float]
 @dataclass
 class NumberSchema(ComparableSchema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=(float, int))
-    _Self = TypeVar('_Self', bound='NumberSchema')
 
-    def positive(self: _Self, message: ErrorMessage = locale["positive"]) -> _Self:
+    def positive(self, message: ErrorMessage = locale["positive"]) -> Self:
         return self.gt(0, message)
 
-    def negative(self: _Self, message: ErrorMessage = locale["negative"]) -> _Self:
+    def negative(self, message: ErrorMessage = locale["negative"]) -> Self:
         return self.lt(0, message)
 
-    def integer(self: _Self, message: ErrorMessage = locale["integer"]) -> _Self:
+    def integer(self, message: ErrorMessage = locale["integer"]) -> Self:
         def _(x: _NumberType) -> None:
             if (x % 1) != 0:
                 raise ValidationError(Constraint("integer", message), invalid_value=x)
@@ -36,8 +37,8 @@ class NumberSchema(ComparableSchema[_T]):
     # def round(self, method: Literal['ceil', 'floor', 'round', 'trunc']) -> 'NumberSchema':
     #     self._transforms
 
-    def multiple_of(self: _Self, multiplier: Union[int, float],
-                    message: ErrorMessage = locale["multiple_of"]) -> _Self:
+    def multiple_of(self, multiplier: Union[int, float],
+                    message: ErrorMessage = locale["multiple_of"]) -> Self:
         def _(x: Union[int, float]) -> None:
             if x % multiplier != 0:
                 raise ValidationError(Constraint("multiple_of", message, multiplier), invalid_value=x)

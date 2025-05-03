@@ -26,7 +26,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
 ]
-dependencies = []
+dependencies = [
+    "typing-extensions>=4.13.2",
+]
 dynamic = ["version"]
 
 

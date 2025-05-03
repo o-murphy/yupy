@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Any, List, TypeVar, Iterable
 
-from yupy.ischema import _SchemaExpectedType
+from typing_extensions import Self
+
+from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.isized_schema import SizedSchema
 from yupy.locale import locale
 from yupy.schema import Schema
@@ -18,9 +20,8 @@ class ArraySchema(SizedSchema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
     _fields: List[Schema[Any]] = field(init=False, default_factory=list)
     _type_of: Schema[Any] = field(init=False, default_factory=Schema)
-    _Self = TypeVar('_Self', bound='ArraySchema')
 
-    def of(self: _Self, schema: Schema[Any], message: ErrorMessage = locale["array_of"]) -> _Self:
+    def of(self, schema: ISchema[Any], message: ErrorMessage = locale["array_of"]) -> Self:
         if not isinstance(schema, Schema):
             raise ValidationError(Constraint("array_of", message, type(schema)), invalid_value=schema)
         self._type_of = schema

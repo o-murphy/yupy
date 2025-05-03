@@ -22,7 +22,7 @@ class Constraint:
         message: Optional[ErrorMessage] = None,
         *args: Any,
     ):
-        self.type = type
+        self.type = type or "undefined"
         self.args = args
         if not message:
             from yupy.locale import get_error_message

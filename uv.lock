@@ -100,6 +100,9 @@ wheels = [
 [[package]]
 name = "yupy"
 source = { editable = "." }
+dependencies = [
+    { name = "typing-extensions" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -107,6 +110,7 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "typing-extensions", specifier = ">=4.13.2" }]
 
 [package.metadata.requires-dev]
 dev = [{ name = "mypy", specifier = ">=1.15.0" }]

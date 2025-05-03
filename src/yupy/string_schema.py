@@ -2,6 +2,8 @@ import re
 from dataclasses import field, dataclass
 from typing import TypeVar
 
+from typing_extensions import Self
+
 from yupy.icomparable_schema import ComparableSchema
 from yupy.ischema import _SchemaExpectedType
 from yupy.locale import locale
@@ -30,7 +32,6 @@ _T = TypeVar('_T')
 @dataclass
 class StringSchema(SizedSchema[_T], ComparableSchema[_T]):
     _type: _SchemaExpectedType = field(init=False, default=str)
-    _Self = TypeVar('_Self', bound='StringSchema')
 
     # def matches(self, regex: re.Pattern, message: ErrorMessage, exclude_empty: bool = False) -> Schema:
     #     def _(x: str):
@@ -39,21 +40,21 @@ class StringSchema(SizedSchema[_T], ComparableSchema[_T]):
     #     self._validators.append(_)
     #     return self
 
-    def email(self: _Self, message: ErrorMessage = locale["email"]) -> _Self:
+    def email(self, message: ErrorMessage = locale["email"]) -> Self:
         def _(x: str) -> None:
             if not re.match(rEmail_pattern, x):
                 raise ValidationError(Constraint("email", message), invalid_value=x)
 
         return self.test(_)
 
-    def url(self: _Self, message: ErrorMessage = locale["url"]) -> _Self:
+    def url(self, message: ErrorMessage = locale["url"]) -> Self:
         def _(x: str) -> None:
             if not re.match(rUrl_pattern, x):
                 raise ValidationError(Constraint("url", message), invalid_value=x)
 
         return self.test(_)
 
-    def uuid(self: _Self, message: ErrorMessage = locale["uuid"]) -> _Self:
+    def uuid(self, message: ErrorMessage = locale["uuid"]) -> Self:
         def _(x: str) -> None:
             if not re.match(rUUID_pattern, x):
                 raise ValidationError(Constraint("uuid", message), invalid_value=x)
@@ -67,7 +68,7 @@ class StringSchema(SizedSchema[_T], ComparableSchema[_T]):
     #     self._validators.append(_)
     #     return self
 
-    def ensure(self: _Self) -> _Self:
+    def ensure(self) -> Self:
         def _(x: str) -> str:
             return x if x else ""
 
@@ -77,14 +78,14 @@ class StringSchema(SizedSchema[_T], ComparableSchema[_T]):
     # def trim(self, message: ErrorMessage):
     #     ...
 
-    def lowercase(self: _Self, message: ErrorMessage = locale["lowercase"]) -> _Self:
+    def lowercase(self, message: ErrorMessage = locale["lowercase"]) -> Self:
         def _(x: str) -> None:
             if x.lower() != x:
                 raise ValidationError(Constraint("lowercase", message), invalid_value=x)
 
         return self.test(_)
 
-    def uppercase(self: _Self, message: ErrorMessage = locale["uppercase"]) -> _Self:
+    def uppercase(self, message: ErrorMessage = locale["uppercase"]) -> Self:
         def _(x: str) -> None:
             if x.upper() != x:
                 raise ValidationError(Constraint("uppercase", message), invalid_value=x)
