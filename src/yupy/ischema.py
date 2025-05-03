@@ -1,13 +1,13 @@
 from types import UnionType
-from typing import Protocol, TypeVar, Callable, Any, TypeAlias, runtime_checkable, List
+from typing import Protocol, TypeVar, Callable, Any, TypeAlias, runtime_checkable, List, Type
 
 from typing_extensions import Self
 
 from yupy.validation_error import ErrorMessage
 
 _T = TypeVar("_T")
-_P = TypeVar('_P', covariant=True)
 _SchemaExpectedType: TypeAlias = type | UnionType | tuple[Any, ...]
+_P = TypeVar('_P', bound=_SchemaExpectedType)
 
 TransformFunc: TypeAlias = Callable[[Any], Any]
 ValidatorFunc: TypeAlias = Callable[[_T], _T]
@@ -15,7 +15,7 @@ ValidatorFunc: TypeAlias = Callable[[_T], _T]
 
 @runtime_checkable
 class ISchema(Protocol[_P]):
-    _type: _SchemaExpectedType
+    _type: Type[_P]
     _transforms: List[TransformFunc]
     _validators: List[ValidatorFunc]
     _optional: bool
@@ -40,7 +40,7 @@ class ISchema(Protocol[_P]):
 
     def test(self, func: ValidatorFunc) -> Self: ...
 
-    def validate(self, value: Any, abort_early: bool = True, path: str = "") -> Any: ...
+    def validate(self, value: Any, abort_early: bool = True, path: str = "") -> _P: ...
 
     def _nullable_check(self, value: Any) -> None: ...
 

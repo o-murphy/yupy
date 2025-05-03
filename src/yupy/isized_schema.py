@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Sized, TypeVar, Protocol, runtime_checkable
+from typing import Sized, Protocol, runtime_checkable
 
 from typing_extensions import Self
 
@@ -9,17 +9,15 @@ from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 
 __all__ = ('ISizedSchema', 'SizedSchema')
 
-_P = TypeVar('_P', covariant=True)
-
 
 @runtime_checkable
-class ISizedSchema(Protocol[_P]):
+class ISizedSchema(Protocol):
 
-    def length(self, limit: int, message: ErrorMessage = locale["length"]) -> _P: ...
+    def length(self, limit: int, message: ErrorMessage = locale["length"]) -> Self: ...
 
-    def min(self, limit: int, message: ErrorMessage = locale["min"]) -> _P: ...
+    def min(self, limit: int, message: ErrorMessage = locale["min"]) -> Self: ...
 
-    def max(self, limit: int, message: ErrorMessage = locale["max"]) -> _P: ...
+    def max(self, limit: int, message: ErrorMessage = locale["max"]) -> Self: ...
 
 
 @dataclass

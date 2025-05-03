@@ -16,7 +16,7 @@ __all__ = ('ArraySchema',)
 @dataclass
 class ArraySchema(SizedSchema):
     _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
-    _fields: List[Schema] = field(init=False, default_factory=list)
+    _fields: List[ISchema] = field(init=False, default_factory=list)
     _type_of: Schema = field(init=False, default_factory=Schema)
 
     def of(self, schema: ISchema, message: ErrorMessage = locale["array_of"]) -> Self:
