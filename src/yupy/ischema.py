@@ -5,11 +5,12 @@ from typing_extensions import Self
 
 from yupy.validation_error import ErrorMessage
 
+_T = TypeVar("_T")
 _P = TypeVar('_P', covariant=True)
 _SchemaExpectedType: TypeAlias = type | UnionType | tuple[Any, ...]
 
 TransformFunc: TypeAlias = Callable[[Any], Any]
-ValidatorFunc: TypeAlias = Callable[[_P], _P]
+ValidatorFunc: TypeAlias = Callable[[_T], _T]
 
 
 @runtime_checkable
