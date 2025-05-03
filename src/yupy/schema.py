@@ -76,7 +76,7 @@ class Schema(Generic[_S]):  # Implement ISchema
             transformed = t(transformed)
         return transformed
 
-    def validate(self: _Self, value: Any, abort_early: bool = True, path: str = "") -> Any:
+    def validate(self: _Self, value: Any, abort_early: bool = True, path: str = "~") -> Any:
         try:
             if value is None:
                 self._nullable_check(value)

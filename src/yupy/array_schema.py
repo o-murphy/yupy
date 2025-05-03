@@ -26,12 +26,12 @@ class ArraySchema(SizedSchema[_T]):
         self._type_of = schema
         return self
 
-    def validate(self, value: Any, abort_early: bool = True, path: str = "") -> Any:
+    def validate(self, value: Any, abort_early: bool = True, path: str = "~") -> Any:
         super().validate(value, abort_early, path)
         return self._validate_array(value, abort_early, path)  # Convert tuple to list for iteration
 
     def _validate_array(self, value: Iterable, abort_early: bool = True,
-                        path: str = "") -> Iterable:
+                        path: str = "~") -> Iterable:
         errs: List[ValidationError] = []
         for i, v in enumerate(value):
             path_ = concat_path(path, i)

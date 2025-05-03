@@ -19,11 +19,11 @@ def concat_path(path: str, item: Union[str, int]) -> str:
     Raises:
         TypeError: If the item is not a string or an integer.
     """
+    if isinstance(item, int):
+        item = f"[{item!r}]"
     if isinstance(item, str):
         if not path:
             return item
-        return ".".join((path, item))
-    elif isinstance(item, int):
-        return f"{path}[{item!r}]"
+        return "/".join((path, item))
     else:
         raise TypeError("Unsupported item type")

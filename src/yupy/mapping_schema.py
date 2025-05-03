@@ -34,11 +34,11 @@ class MappingSchema(Schema[_T]):
         self._fields = fields
         return self
 
-    def validate(self, value: Any, abort_early: bool = True, path: str = "") -> Any:
+    def validate(self, value: Any, abort_early: bool = True, path: str = "~") -> Any:
         super().validate(value, abort_early, path)
         return self._validate_shape(value, abort_early, path)
 
-    def _validate_shape(self, value: Mapping[str, Any], abort_early: bool = True, path: str = "") -> Mapping[str, Any]:
+    def _validate_shape(self, value: Mapping[str, Any], abort_early: bool = True, path: str = "~") -> Mapping[str, Any]:
         errs: list[ValidationError] = []
         for k, f in self._fields.items():
             path_ = concat_path(path, k)
