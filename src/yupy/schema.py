@@ -1,5 +1,5 @@
 from dataclasses import field, dataclass
-from typing import Any, List, TypeVar, Generic
+from typing import Any, List
 
 from typing_extensions import Self
 
@@ -9,11 +9,9 @@ from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 
 __all__ = ('Schema',)
 
-_T = TypeVar('_T')
-
 
 @dataclass
-class Schema(Generic[_T]):  # Implement ISchema
+class Schema:  # Implement ISchema
     _type: _SchemaExpectedType = field(default=object)
     _transforms: List[TransformFunc] = field(init=False, default_factory=list)
     _validators: List[ValidatorFunc] = field(init=False, default_factory=list)

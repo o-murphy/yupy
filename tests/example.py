@@ -49,3 +49,19 @@ if __name__ == "__main__":
 
     # m = mixed().one_of(['G1', 'G7'])
     # m.validate('F')
+
+    def check():
+        try:
+            shp.validate(
+                {
+                    "email": "a@gmail.com",
+                    "s": "wd",
+                    "n": 60,
+                    "shp": {"n": "a", "l": ["ab", "b"], "o": {"n": ["g", "g"]}},
+                }, False
+            )
+        except ValidationError as err:
+            ...
+
+    from timeit import timeit
+    print(timeit(check, number=10000))

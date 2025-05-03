@@ -7,6 +7,7 @@ __all__ = (
     'Constraint',
 )
 
+from typing_extensions import Self
 
 ErrorMessage: TypeAlias = Union[str, Callable[[Any | List[Any]], str]]
 
@@ -18,10 +19,10 @@ class Constraint:
     message: ErrorMessage = field(repr=False)
 
     def __init__(self,
-        type: Optional[str],
-        message: Optional[ErrorMessage] = None,
-        *args: Any,
-    ):
+                 type: Optional[str],
+                 message: Optional[ErrorMessage] = None,
+                 *args: Any,
+                 ):
         self.type = type or "undefined"
         self.args = args
         if not message:

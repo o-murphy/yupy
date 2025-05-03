@@ -1,5 +1,5 @@
 from types import UnionType
-from typing import Protocol, TypeVar, Callable, Any, TypeAlias, runtime_checkable
+from typing import Protocol, TypeVar, Callable, Any, TypeAlias, runtime_checkable, List
 
 from typing_extensions import Self
 
@@ -16,8 +16,8 @@ ValidatorFunc: TypeAlias = Callable[[_T], _T]
 @runtime_checkable
 class ISchema(Protocol[_P]):
     _type: _SchemaExpectedType
-    _transforms: list[TransformFunc]
-    _validators: list[ValidatorFunc]
+    _transforms: List[TransformFunc]
+    _validators: List[ValidatorFunc]
     _optional: bool
     _required: ErrorMessage
     _nullability: bool

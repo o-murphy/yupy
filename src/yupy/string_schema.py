@@ -1,13 +1,12 @@
 import re
 from dataclasses import field, dataclass
-from typing import TypeVar
 
 from typing_extensions import Self
 
 from yupy.icomparable_schema import ComparableSchema
 from yupy.ischema import _SchemaExpectedType
-from yupy.locale import locale
 from yupy.isized_schema import SizedSchema
+from yupy.locale import locale
 from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 
 __all__ = ('StringSchema',)
@@ -27,10 +26,9 @@ rUrl_pattern = re.compile(
     re.IGNORECASE,
 )
 
-_T = TypeVar('_T')
 
 @dataclass
-class StringSchema(SizedSchema[_T], ComparableSchema[_T]):
+class StringSchema(SizedSchema, ComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=str)
 
     # def matches(self, regex: re.Pattern, message: ErrorMessage, exclude_empty: bool = False) -> Schema:

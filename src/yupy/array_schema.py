@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, List, TypeVar, Iterable
+from typing import Any, List, Iterable
 
 from typing_extensions import Self
 
@@ -12,16 +12,14 @@ from yupy.validation_error import ErrorMessage, Constraint, ValidationError
 
 __all__ = ('ArraySchema',)
 
-_T = TypeVar('_T')
-
 
 @dataclass
-class ArraySchema(SizedSchema[_T]):
+class ArraySchema(SizedSchema):
     _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
-    _fields: List[Schema[Any]] = field(init=False, default_factory=list)
-    _type_of: Schema[Any] = field(init=False, default_factory=Schema)
+    _fields: List[Schema] = field(init=False, default_factory=list)
+    _type_of: Schema = field(init=False, default_factory=Schema)
 
-    def of(self, schema: ISchema[Any], message: ErrorMessage = locale["array_of"]) -> Self:
+    def of(self, schema: ISchema, message: ErrorMessage = locale["array_of"]) -> Self:
         if not isinstance(schema, Schema):
             raise ValidationError(Constraint("array_of", message, type(schema)), invalid_value=schema)
         self._type_of = schema
@@ -49,5 +47,5 @@ class ArraySchema(SizedSchema[_T]):
                 path, errs, invalid_value=value)
         return value
 
-    def __getitem__(self, item: int) -> Schema[Any]:
+    def __getitem__(self, item: int) -> ISchema:
         return self._fields[item]

@@ -15,7 +15,7 @@ _NumberType: TypeAlias = Union[int, float]
 
 
 @dataclass
-class NumberSchema(ComparableSchema[_T]):
+class NumberSchema(ComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=(float, int))
 
     def positive(self, message: ErrorMessage = locale["positive"]) -> Self:

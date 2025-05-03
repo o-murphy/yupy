@@ -10,7 +10,6 @@ from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 __all__ = ('ISizedSchema', 'SizedSchema')
 
 _P = TypeVar('_P', covariant=True)
-_T = TypeVar('_T')
 
 
 @runtime_checkable
@@ -24,7 +23,7 @@ class ISizedSchema(Protocol[_P]):
 
 
 @dataclass
-class SizedSchema(Schema[_T]):
+class SizedSchema(Schema):
 
     def length(self, limit: int, message: ErrorMessage = locale["length"]) -> Self:
         def _(x: Sized) -> None:  # Use Sized instead of Iterable

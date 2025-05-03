@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Mapping, TypeVar, TypeAlias
+from typing import Any, Mapping, TypeAlias
 
 from typing_extensions import Self
 
@@ -11,14 +11,13 @@ from yupy.validation_error import ValidationError, Constraint
 
 __all__ = ('MappingSchema',)
 
-_T = TypeVar('_T')
 _SchemaShape: TypeAlias = Mapping[str, ISchema[Any]]
 
 
 @dataclass
-class MappingSchema(Schema[_T]):
+class MappingSchema(Schema):
     _type: _SchemaExpectedType = field(init=False, default=dict)
-    _fields: Mapping[str, Schema[Any]] = field(init=False, default_factory=dict)
+    _fields: _SchemaShape = field(init=False, default_factory=dict)
 
     def shape(self, fields: _SchemaShape) -> Self:
         if not isinstance(fields, dict):  # Перевірка залишається на dict, оскільки shape визначається через dict
@@ -62,5 +61,5 @@ class MappingSchema(Schema[_T]):
             )
         return value
 
-    def __getitem__(self, item: str) -> Schema[Any]:
+    def __getitem__(self, item: str) -> ISchema:
         return self._fields[item]

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Iterable, TypeVar
+from typing import Any, Iterable
 
 from typing_extensions import Self
 
@@ -10,11 +10,9 @@ from yupy.validation_error import ErrorMessage, Constraint, ValidationError
 
 __all__ = ('MixedSchema',)
 
-_T = TypeVar('_T')
-
 
 @dataclass
-class MixedSchema(Schema[_T]):
+class MixedSchema(Schema):
     _type: _SchemaExpectedType = field(default=object)
 
     def one_of(self, items: Iterable, message: ErrorMessage = locale['one_of']) -> Self:

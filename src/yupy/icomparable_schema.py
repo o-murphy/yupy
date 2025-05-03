@@ -9,7 +9,6 @@ from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 __all__ = ('IComparableSchema', 'ComparableSchema')
 
 _P = TypeVar('_P', covariant=True)
-_T = TypeVar('_T')
 
 
 @runtime_checkable
@@ -23,7 +22,7 @@ class IComparableSchema(Protocol[_P]):
     def gt(self, limit: Any, message: ErrorMessage = locale["gt"]) -> _P: ...
 
 
-class ComparableSchema(Schema[_T]):
+class ComparableSchema(Schema):
 
     def le(self, limit: Any, message: ErrorMessage = locale["le"]) -> Self:
         def _(x: Any) -> None:
