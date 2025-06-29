@@ -3,7 +3,7 @@ from typing import Union, TypeAlias, TypeVar
 
 from typing_extensions import Self
 
-from yupy.icomparable_schema import ComparableSchema
+from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType
 from yupy.locale import locale
 from yupy.validation_error import ErrorMessage, ValidationError, Constraint
@@ -15,7 +15,7 @@ _NumberType: TypeAlias = Union[int, float]
 
 
 @dataclass
-class NumberSchema(ComparableSchema):
+class NumberSchema(ComparableSchema, EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=(float, int))
 
     def positive(self, message: ErrorMessage = locale["positive"]) -> Self:

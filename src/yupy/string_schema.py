@@ -3,7 +3,7 @@ from dataclasses import field, dataclass
 
 from typing_extensions import Self
 
-from yupy.icomparable_schema import ComparableSchema
+from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType
 from yupy.isized_schema import SizedSchema
 from yupy.locale import locale
@@ -28,7 +28,7 @@ rUrl_pattern = re.compile(
 
 
 @dataclass
-class StringSchema(SizedSchema, ComparableSchema):
+class StringSchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=str)
 
     # def matches(self, regex: re.Pattern, message: ErrorMessage, exclude_empty: bool = False) -> Schema:

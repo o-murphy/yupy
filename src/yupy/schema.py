@@ -1,5 +1,5 @@
 from dataclasses import field, dataclass
-from typing import Any, List, TypeVar, Optional, Generic, Type
+from typing import Any, List, Optional
 
 from typing_extensions import Self
 

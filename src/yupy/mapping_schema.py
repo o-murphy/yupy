@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, MutableMapping, TypeAlias
 from typing_extensions import Self
 
+from yupy.icomparable_schema import EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.locale import locale
 from yupy.schema import Schema
@@ -14,7 +15,7 @@ _SchemaShape: TypeAlias = MutableMapping[str, ISchema[Any]]
 
 
 @dataclass
-class MappingSchema(Schema):
+class MappingSchema(EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=dict)
     _fields: _SchemaShape = field(init=False, default_factory=dict)
 

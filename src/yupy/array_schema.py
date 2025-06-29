@@ -3,6 +3,7 @@ from typing import Any, List, Iterable
 
 from typing_extensions import Self
 
+from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.isized_schema import SizedSchema
 from yupy.locale import locale
@@ -14,7 +15,7 @@ __all__ = ('ArraySchema',)
 
 
 @dataclass
-class ArraySchema(SizedSchema):
+class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
     _fields: List[ISchema] = field(init=False, default_factory=list)
     _type_of: Schema = field(init=False, default_factory=Schema)
