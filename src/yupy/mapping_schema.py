@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Mapping, TypeAlias
-
+from typing import Any, MutableMapping, TypeAlias
 from typing_extensions import Self
 
 from yupy.ischema import _SchemaExpectedType, ISchema
@@ -11,13 +10,17 @@ from yupy.validation_error import ValidationError, Constraint
 
 __all__ = ('MappingSchema',)
 
-_SchemaShape: TypeAlias = Mapping[str, ISchema[Any]]
+_SchemaShape: TypeAlias = MutableMapping[str, ISchema[Any]]
 
 
 @dataclass
 class MappingSchema(Schema):
     _type: _SchemaExpectedType = field(init=False, default=dict)
     _fields: _SchemaShape = field(init=False, default_factory=dict)
+
+    # @property
+    # def fields(self) -> _SchemaShape:
+    #     return self._fields
 
     def shape(self, fields: _SchemaShape) -> Self:
         if not isinstance(fields, dict):  # Перевірка залишається на dict, оскільки shape визначається через dict
@@ -38,18 +41,24 @@ class MappingSchema(Schema):
         super().validate(value, abort_early, path)
         return self._validate_shape(value, abort_early, path)
 
-    def _validate_shape(self, value: Mapping[str, Any], abort_early: bool = True, path: str = "~") -> Mapping[str, Any]:
+    def _validate_shape(self, value: MutableMapping[str, Any],
+                        abort_early: bool = True,
+                        path: str = "~") -> MutableMapping[str, Any]:
+
         errs: list[ValidationError] = []
         for k, f in self._fields.items():
             path_ = concat_path(path, k)
             try:
-                if not self._fields[k]._optional and k not in value:
-                    raise ValidationError(
-                        Constraint("required", self._fields[k]._required, path_),
-                        path_, invalid_value=value
-                    )
-                if k in value:
-                    self._fields[k].validate(value[k], abort_early, path_)
+                if k not in value:
+                    if not self._fields[k]._optional:
+                        raise ValidationError(
+                            Constraint("required", self._fields[k]._required, path_),
+                            path_, invalid_value=value
+                        )
+
+                    value[k] = self._fields[k].validate(None, abort_early, path_)
+                else:
+                    value[k] = self._fields[k].validate(value[k], abort_early, path_)
             except ValidationError as err:
                 if abort_early:
                     raise ValidationError(err.constraint, path_, invalid_value=value)

@@ -9,6 +9,7 @@ __all__ = (
 
 
 class Locale(TypedDict, total=False):
+    const: ErrorMessage
     type: ErrorMessage
     min: ErrorMessage
     max: ErrorMessage
@@ -26,6 +27,8 @@ class Locale(TypedDict, total=False):
     ge: ErrorMessage
     lt: ErrorMessage
     gt: ErrorMessage
+    eq: ErrorMessage
+    ne: ErrorMessage
     integer: ErrorMessage
     multiple_of: ErrorMessage
     positive: ErrorMessage
@@ -38,13 +41,15 @@ class Locale(TypedDict, total=False):
 
 
 LocaleKey = Literal[
-    "type", "min", "max", "length", "required", "not_nullable", "test", "matches",
-    "email", "url", "uuid", "lowercase", "uppercase", "le", "ge", "lt", "gt",
+    "const", "type", "min", "max", "length", "required", "not_nullable", "test", "matches",
+    "email", "url", "uuid", "lowercase", "uppercase",
+    "le", "ge", "lt", "gt", "eq", "ne",
     "integer", "multiple_of", "positive", "negative", "array_of", "shape",
     "shape_values", "one_of", "undefined"
 ]
 
 locale: Locale = {
+    "const": lambda args: "Value is not match the const %r" % args,
     "type": lambda args: "Value is not of type %r, got %r" % args,
     "min": lambda args: "Min length must be %r" % args,
     "max": lambda args: "Max length must be %r" % args,
@@ -62,6 +67,8 @@ locale: Locale = {
     "ge": lambda args: "Value must be greater or equal to %r" % args,
     "lt": lambda args: "Value must be less than %r" % args,
     "gt": lambda args: "Value must be greater than %r" % args,
+    "eq": lambda args: "Value must be equal to %r" % args,
+    "ne": lambda args: "Value must be not equal to %r" % args,
     "positive": "Value must be positive, a.g. > 0",
     "negative": "Value must be positive, a.g. < 0",
     "integer": "Value must be valid 'int', got 'float'",

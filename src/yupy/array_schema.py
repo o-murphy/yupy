@@ -19,6 +19,10 @@ class ArraySchema(SizedSchema):
     _fields: List[ISchema] = field(init=False, default_factory=list)
     _type_of: Schema = field(init=False, default_factory=Schema)
 
+    # @property
+    # def fields(self) -> List[ISchema]:
+    #     return self._fields
+
     def of(self, schema: ISchema, message: ErrorMessage = locale["array_of"]) -> Self:
         if not isinstance(schema, Schema):
             raise ValidationError(Constraint("array_of", message, type(schema)), invalid_value=schema)

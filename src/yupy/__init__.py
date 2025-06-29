@@ -1,9 +1,11 @@
-# from .sized_mixin import *
 from .array_schema import *
+from .icomparable_schema import IComparableSchema, ComparableSchema
+from .ischema import ISchema
+from .isized_schema import ISizedSchema, SizedSchema
 from .locale import *
+from .mapping_schema import *
 from .mixed_schema import *
 from .number_schema import *
-from .mapping_schema import *
 from .schema import *
 from .string_schema import *
 from .validation_error import *
@@ -25,7 +27,11 @@ __all__ = (
     'ArraySchema',
     'MixedSchema',
 
-    # 'SizedMixin',
+    'ISchema',
+    'IComparableSchema',
+    'ComparableSchema',
+    'ISizedSchema',
+    'SizedSchema',
 
     'string',
     'number',

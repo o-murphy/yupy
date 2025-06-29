@@ -1,5 +1,5 @@
 from dataclasses import field, dataclass
-from typing import Any, List
+from typing import Any, List, TypeVar, Optional, Generic, Type
 
 from typing_extensions import Self
 
@@ -19,10 +19,15 @@ class Schema:  # Implement ISchema
     _required: ErrorMessage = locale["required"]
     _nullability: bool = False
     _not_nullable: ErrorMessage = locale["not_nullable"]
+    _default: Optional[_SchemaExpectedType] = None
 
     @property
     def optional(self) -> bool:
         return self._optional
+
+    @property
+    def nullability(self) -> bool:
+        return self._nullability
 
     def required(self, message: ErrorMessage = locale["required"]) -> Self:
         self._required: ErrorMessage = message
@@ -74,15 +79,28 @@ class Schema:  # Implement ISchema
             transformed = t(transformed)
         return transformed
 
+    def default(self, value: Optional[_SchemaExpectedType]) -> Self:
+        self._default = value
+        return self
+
+    def const(self, value: Optional[_SchemaExpectedType], message: ErrorMessage = locale["const"]) -> Self:
+        def _(x: Any) -> None:
+            if x != value:
+                raise ValidationError(Constraint("const", message, value), invalid_value=x)
+        return self.test(_)
+
     def validate(self, value: Any, abort_early: bool = True, path: str = "~") -> Any:
         try:
             if value is None:
                 self._nullable_check(value)
-                return value
-
-            self._type_check(value)
+                if self._default is not None:
+                    value = self._default
+                else:
+                    return None
 
             transformed = self._transform(value)
+
+            self._type_check(transformed)
 
             for v in self._validators:
                 v(transformed)
