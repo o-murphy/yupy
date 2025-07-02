@@ -19,6 +19,10 @@ array = ArraySchema
 mixed = MixedSchema
 union = UnionSchema
 
+immutable = SchemaImmutableAdapter
+default = SchemaDefaultAdapter
+required = SchemaRequiredAdapter
+
 __all__ = (
     'ErrorMessage',
     'ValidatorFunc',
@@ -47,9 +51,6 @@ __all__ = (
     'SchemaRequiredAdapter',
     'SchemaImmutableAdapter',
     '_REQUIRED_UNDEFINED_',
-    'immutable',
-    'required',
-    'default',
 
     'string',
     'number',
@@ -57,6 +58,10 @@ __all__ = (
     'array',
     'mixed',
     'union',
+
+    'immutable',
+    'required',
+    'default',
 
     'locale',
     'set_locale',

@@ -26,16 +26,20 @@
 from typing import Any
 
 
-from yupy import string, mapping
+from yupy import number, mapping, ValidationError
 
-from yupy.adapters import *
-
-
-s = mapping().shape({
-    "a": required(string())
+s = mapping().strict().shape({
+    "a": number()
 })
 
+# Вхідні дані, які ми хочемо валідувати
+input_data = {
+    "a": 123,
+    "b": "лишнє поле",  # Це "невідоме" поле
+    "c": True         # Ще одне "невідоме" поле
+}
+
 try:
-    print(s.validate({}))
+    print(s.validate(input_data))
 except ValidationError as err:
     print(err)

@@ -16,9 +16,6 @@ __all__ = (
     'SchemaRequiredAdapter',
     'SchemaImmutableAdapter',
     '_REQUIRED_UNDEFINED_',
-    'immutable',
-    'required',
-    'default',
 )
 
 
@@ -104,8 +101,3 @@ class SchemaImmutableAdapter(SchemaAdapter):
         value_copy = deepcopy(value)
         self._schema.validate(value_copy, abort_early, path)
         return value
-
-
-immutable = SchemaImmutableAdapter
-default = SchemaDefaultAdapter
-required = SchemaRequiredAdapter

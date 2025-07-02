@@ -4,7 +4,7 @@ from typing_extensions import Self
 
 from yupy.adapters import _REQUIRED_UNDEFINED_, ISchemaAdapter
 from yupy.icomparable_schema import EqualityComparableSchema
-from yupy.ischema import _SchemaExpectedType, ISchema
+from yupy.ischema import _SchemaExpectedType, ISchema, ErrorMessage
 from yupy.locale import locale
 from yupy.util.concat_path import concat_path
 from yupy.validation_error import ValidationError, Constraint
@@ -27,12 +27,28 @@ class MappingSchema(EqualityComparableSchema):
         for key, item in fields.items():
             if not isinstance(item, (ISchema, ISchemaAdapter)):
                 raise ValidationError(
-                    Constraint("shape_values", locale["shape_values"]),
+                    Constraint("shape_fields", locale["shape_values"]),
                     key,
                     invalid_value=item
                 )
         self._fields = fields
         return self
+
+    def strict(self, message: ErrorMessage = locale['strict']) -> Self:
+        def _(x: dict) -> None:
+            defined_keys = set(self._fields.keys())
+            input_keys = set(x.keys())
+
+            unknown_keys = input_keys - defined_keys
+            print(defined_keys, input_keys)
+
+            if unknown_keys:
+                raise ValidationError(
+                    Constraint("strict", message, list(unknown_keys)),
+                    invalid_value=x
+                )
+
+        return self.test(_)
 
     def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
         value = super().validate(value, abort_early, path)

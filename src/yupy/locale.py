@@ -35,7 +35,8 @@ class Locale(TypedDict, total=False):
     negative: ErrorMessage
     array_of: ErrorMessage
     shape: ErrorMessage
-    shape_values: ErrorMessage
+    shape_fields: ErrorMessage
+    strict: ErrorMessage
     one_of: ErrorMessage
     undefined: ErrorMessage
 
@@ -45,7 +46,7 @@ LocaleKey = Literal[
     "email", "url", "uuid", "lowercase", "uppercase",
     "le", "ge", "lt", "gt", "eq", "ne",
     "integer", "multiple_of", "positive", "negative", "array_of", "shape",
-    "shape_values", "one_of", "undefined"
+    "shape_fields", "strict", "one_of", "undefined"
 ]
 
 locale: Locale = {
@@ -75,7 +76,8 @@ locale: Locale = {
     "array_of": lambda args: "Schema must be a type of Schema, got %r" % args,
     "multiple_of": lambda args: "Value must be a multiple of %r" % args,
     "shape": "'shape' must be a type of 'Shape'",
-    "shape_values": "all shape items must have a values of type of Schema",
+    "shape_fields": "all shape items must have a values of type of Schema",
+    "strict": lambda args: "Object contains unknown keys: %s" % (", ".join(map(repr, args)),),
     "one_of": lambda args: "Must be one of %r" % args,
     "undefined": "undefined validation error"
 }
