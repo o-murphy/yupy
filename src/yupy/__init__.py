@@ -10,6 +10,7 @@ from .schema import *
 from .string_schema import *
 from .union_schema import *
 from .validation_error import *
+from .adapters import *
 
 string = StringSchema
 number = NumberSchema
@@ -39,6 +40,16 @@ __all__ = (
     'EqualityComparableSchema',
     'ISizedSchema',
     'SizedSchema',
+
+    'ISchemaAdapter',
+    'SchemaAdapter',
+    'SchemaDefaultAdapter',
+    'SchemaRequiredAdapter',
+    'SchemaImmutableAdapter',
+    '_REQUIRED_UNDEFINED_',
+    'immutable',
+    'required',
+    'default',
 
     'string',
     'number',

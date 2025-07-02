@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Any, MutableMapping, TypeAlias
+from typing import Any, MutableMapping, TypeAlias, Union
 from typing_extensions import Self
 
+from yupy.adapters import _REQUIRED_UNDEFINED_, ISchemaAdapter
 from yupy.icomparable_schema import EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.locale import locale
@@ -10,7 +11,7 @@ from yupy.validation_error import ValidationError, Constraint
 
 __all__ = ('MappingSchema',)
 
-_SchemaShape: TypeAlias = MutableMapping[str, ISchema[Any]]
+_SchemaShape: TypeAlias = MutableMapping[str, Union[ISchema[Any], ISchemaAdapter]]
 
 
 @dataclass
@@ -18,17 +19,13 @@ class MappingSchema(EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=dict)
     _fields: _SchemaShape = field(init=False, default_factory=dict)
 
-    # @property
-    # def fields(self) -> _SchemaShape:
-    #     return self._fields
-
     def shape(self, fields: _SchemaShape) -> Self:
         if not isinstance(fields, dict):  # Перевірка залишається на dict, оскільки shape визначається через dict
             raise ValidationError(
                 Constraint("shape", locale["shape"])
             )
         for key, item in fields.items():
-            if not isinstance(item, ISchema):
+            if not isinstance(item, (ISchema, ISchemaAdapter)):
                 raise ValidationError(
                     Constraint("shape_values", locale["shape_values"]),
                     key,
@@ -46,19 +43,10 @@ class MappingSchema(EqualityComparableSchema):
                         path: str = "~") -> MutableMapping[str, Any]:
 
         errs: list[ValidationError] = []
-        for k, f in self._fields.items():
-            path_ = concat_path(path, k)
+        for key, field in self._fields.items():
+            path_ = concat_path(path, key)
             try:
-                if k not in value:
-                    if not self._fields[k]._optional:
-                        raise ValidationError(
-                            Constraint("required", self._fields[k]._required, path_),
-                            path_, invalid_value=value
-                        )
-
-                    value[k] = self._fields[k].validate(None, abort_early, path_)
-                else:
-                    value[k] = self._fields[k].validate(value[k], abort_early, path_)
+                value[key] = field.validate(value.get(key, _REQUIRED_UNDEFINED_), abort_early, path_)
             except ValidationError as err:
                 if abort_early:
                     raise ValidationError(err.constraint, path_, invalid_value=value)
@@ -70,5 +58,5 @@ class MappingSchema(EqualityComparableSchema):
             )
         return value
 
-    def __getitem__(self, item: str) -> ISchema:
+    def __getitem__(self, item: str) -> Union[ISchema, ISchemaAdapter]:
         return self._fields[item]

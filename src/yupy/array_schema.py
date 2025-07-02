@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
-from typing import Any, List, Iterable
+from typing import Any, List, Iterable, Union
 
 from typing_extensions import Self
 
+from yupy.adapters import ISchemaAdapter
 from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.isized_schema import SizedSchema
@@ -17,15 +18,11 @@ __all__ = ('ArraySchema',)
 @dataclass
 class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
-    _fields: List[ISchema] = field(init=False, default_factory=list)
-    _of_schema_type: ISchema = field(init=False, default_factory=Schema)
+    _fields: List[Union[ISchema, ISchemaAdapter]] = field(init=False, default_factory=list)
+    _of_schema_type: Union[ISchema, ISchemaAdapter] = field(init=False, default_factory=Schema)
 
-    # @property
-    # def fields(self) -> List[ISchema]:
-    #     return self._fields
-
-    def of(self, schema: ISchema, message: ErrorMessage = locale["array_of"]) -> Self:
-        if not isinstance(schema, ISchema):
+    def of(self, schema: Union[ISchema, ISchemaAdapter], message: ErrorMessage = locale["array_of"]) -> Self:
+        if not isinstance(schema, (ISchema, ISchemaAdapter)):
             raise ValidationError(Constraint("array_of", message, type(schema)), invalid_value=schema)
         self._of_schema_type = schema
         return self
@@ -52,5 +49,5 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
                 path, errs, invalid_value=value)
         return value
 
-    def __getitem__(self, item: int) -> ISchema:
+    def __getitem__(self, item: int) -> Union[ISchema, ISchemaAdapter]:
         return self._fields[item]

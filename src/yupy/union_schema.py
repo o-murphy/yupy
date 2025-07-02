@@ -3,6 +3,7 @@ from typing import Any, List, Union, Tuple
 
 from typing_extensions import Self
 
+from yupy.adapters import ISchemaAdapter
 from yupy.icomparable_schema import EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.locale import locale
@@ -11,12 +12,12 @@ from yupy.validation_error import ErrorMessage, Constraint, ValidationError
 
 __all__ = ('UnionSchema',)
 
-UnionOptionsType = Union[List[ISchema], Tuple[ISchema, ...]]
+UnionOptionsType = Union[List[Union[ISchema, ISchemaAdapter]], Tuple[Union[ISchema, ISchemaAdapter], ...]]
 
 @dataclass
 class UnionSchema(EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=object)
-    _options: Union[List[ISchema], Tuple[ISchema, Any]] = field(init=False, default_factory=list)
+    _options: UnionOptionsType = field(init=False, default_factory=list)
 
     def one_of(self, options: UnionOptionsType, message: ErrorMessage = locale["one_of"]) -> Self:
         for schema in options:

@@ -5,11 +5,11 @@ __all__ = (
     'ErrorMessage',
     'ValidationError',
     'Constraint',
+    '_EMPTY_MESSAGE_',
 )
 
-from typing_extensions import Self
-
 ErrorMessage: TypeAlias = Union[str, Callable[[Any | List[Any]], str]]
+_EMPTY_MESSAGE_: ErrorMessage = ""
 
 
 @dataclass

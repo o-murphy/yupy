@@ -15,28 +15,12 @@ class Schema:  # Implement ISchema
     _type: _SchemaExpectedType = field(default=object)
     _transforms: List[TransformFunc] = field(init=False, default_factory=list)
     _validators: List[ValidatorFunc] = field(init=False, default_factory=list)
-    _optional: bool = True
-    _required: ErrorMessage = locale["required"]
     _nullability: bool = False
     _not_nullable: ErrorMessage = locale["not_nullable"]
-    _default: Optional[_SchemaExpectedType] = None
-
-    @property
-    def optional(self) -> bool:
-        return self._optional
 
     @property
     def nullability(self) -> bool:
         return self._nullability
-
-    def required(self, message: ErrorMessage = locale["required"]) -> Self:
-        self._required: ErrorMessage = message
-        self._optional: bool = False
-        return self
-
-    def not_required(self) -> Self:
-        self._optional: bool = True
-        return self
 
     def nullable(self) -> Self:
         self._nullability: bool = True
@@ -48,7 +32,7 @@ class Schema:  # Implement ISchema
         return self
 
     def _nullable_check(self, value: Any) -> None:
-        if not self._nullability:
+        if not self._nullability and value is None:
             raise ValidationError(
                 Constraint("nullable", self._not_nullable),
                 invalid_value=value
@@ -69,37 +53,20 @@ class Schema:  # Implement ISchema
         self._transforms.append(func)
         return self
 
-    def test(self, func: ValidatorFunc) -> Self:
-        self._validators.append(func)
-        return self
-
     def _transform(self, value: Any) -> Any:
         transformed: Any = value
         for t in self._transforms:
             transformed = t(transformed)
         return transformed
 
-    def default(self, value: Optional[_SchemaExpectedType]) -> Self:
-        self._default = value
+    def test(self, func: ValidatorFunc) -> Self:
+        self._validators.append(func)
         return self
-
-    def const(self, value: Optional[_SchemaExpectedType], message: ErrorMessage = locale["const"]) -> Self:
-        def _(x: Any) -> None:
-            if x != value:
-                raise ValidationError(Constraint("const", message, value), invalid_value=x)
-        return self.test(_)
 
     def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
         try:
-            if value is None:
-                self._nullable_check(value)
-                if self._default is not None:
-                    value = self._default
-                else:
-                    return None
-
+            self._nullable_check(value)
             transformed = self._transform(value)
-
             self._type_check(transformed)
 
             for v in self._validators:
@@ -107,3 +74,10 @@ class Schema:  # Implement ISchema
             return transformed
         except ValidationError as err:
             raise ValidationError(err.constraint, path, invalid_value=value)
+
+    def const(self, value: Optional[_SchemaExpectedType], message: ErrorMessage = locale["const"]) -> Self:
+        def _(x: Any) -> None:
+            if x != value:
+                raise ValidationError(Constraint("const", message, value), invalid_value=x)
+
+        return self.test(_)
