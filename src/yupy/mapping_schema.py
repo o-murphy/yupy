@@ -5,7 +5,6 @@ from typing_extensions import Self
 from yupy.icomparable_schema import EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.locale import locale
-from yupy.schema import Schema
 from yupy.util.concat_path import concat_path
 from yupy.validation_error import ValidationError, Constraint
 
@@ -38,8 +37,8 @@ class MappingSchema(EqualityComparableSchema):
         self._fields = fields
         return self
 
-    def validate(self, value: Any, abort_early: bool = True, path: str = "~") -> Any:
-        super().validate(value, abort_early, path)
+    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
+        value = super().validate(value, abort_early, path)
         return self._validate_shape(value, abort_early, path)
 
     def _validate_shape(self, value: MutableMapping[str, Any],

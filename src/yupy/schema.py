@@ -89,7 +89,7 @@ class Schema:  # Implement ISchema
                 raise ValidationError(Constraint("const", message, value), invalid_value=x)
         return self.test(_)
 
-    def validate(self, value: Any, abort_early: bool = True, path: str = "~") -> Any:
+    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
         try:
             if value is None:
                 self._nullable_check(value)

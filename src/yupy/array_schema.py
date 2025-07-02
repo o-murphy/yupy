@@ -18,20 +18,20 @@ __all__ = ('ArraySchema',)
 class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
     _fields: List[ISchema] = field(init=False, default_factory=list)
-    _type_of: Schema = field(init=False, default_factory=Schema)
+    _of_schema_type: ISchema = field(init=False, default_factory=Schema)
 
     # @property
     # def fields(self) -> List[ISchema]:
     #     return self._fields
 
     def of(self, schema: ISchema, message: ErrorMessage = locale["array_of"]) -> Self:
-        if not isinstance(schema, Schema):
+        if not isinstance(schema, ISchema):
             raise ValidationError(Constraint("array_of", message, type(schema)), invalid_value=schema)
-        self._type_of = schema
+        self._of_schema_type = schema
         return self
 
-    def validate(self, value: Any, abort_early: bool = True, path: str = "~") -> Any:
-        super().validate(value, abort_early, path)
+    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
+        value = super().validate(value, abort_early, path)
         return self._validate_array(value, abort_early, path)  # Convert tuple to list for iteration
 
     def _validate_array(self, value: Iterable, abort_early: bool = True,
@@ -40,7 +40,7 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
         for i, v in enumerate(value):
             path_ = concat_path(path, i)
             try:
-                self._type_of.validate(v, abort_early, path_)
+                value = self._of_schema_type.validate(v, abort_early, path_)
             except ValidationError as err:
                 if abort_early:
                     raise ValidationError(err.constraint, path_, invalid_value=v)
