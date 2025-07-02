@@ -37,6 +37,7 @@ class Locale(TypedDict, total=False):
     positive: ErrorMessage
     negative: ErrorMessage
     array: ErrorMessage
+    mapping: ErrorMessage
     array_of: ErrorMessage
     shape: ErrorMessage
     shape_fields: ErrorMessage
@@ -49,7 +50,7 @@ LocaleKey = Literal[
     "const", "type", "min", "max", "length", "required", "nullable", "not_nullable", "test", "matches",
     "email", "url", "uuid", "lowercase", "uppercase",
     "le", "ge", "lt", "gt", "eq", "ne",
-    "integer", "multiple_of", "positive", "negative", "array", "array_of", "shape",
+    "integer", "multiple_of", "positive", "negative", "mapping", "array", "array_of", "shape",
     "shape_fields", "strict", "one_of", "undefined"
 ]
 
@@ -61,7 +62,7 @@ locale: Locale = {
     "length": lambda args: "Length must be %r" % args,
     "uppercase": "Value must be an uppercase string",
     "lowercase": "Value must be a lowercase string",
-    "required": "Field is required",
+    "required": "Value is required",
     "nullable": "Value can't be null",
     "not_nullable": "Value can't be null",
     "test": "Test failed",
@@ -78,14 +79,15 @@ locale: Locale = {
     "positive": "Value must be positive, a.g. > 0",
     "negative": "Value must be positive, a.g. < 0",
     "integer": "Value must be valid 'int', got 'float'",
-    "array": "invalid array",
+    "array": "Invalid array",
+    "mapping": "Invalid mapping",
     "array_of": lambda args: "Schema must be a type of ISchema or ISchemaAdapter, got %r" % args,
     "multiple_of": lambda args: "Value must be a multiple of %r" % args,
-    "shape": "'shape' must be a type of 'Shape'",
-    "shape_fields": "all shape items must have a values of type of Schema",
+    "shape": "'Shape' must be a type of 'Shape'",
+    "shape_fields": "All shape items must have a values of type of ISchema or ISchemaAdapter",
     "strict": lambda args: "Object contains unknown keys: %s" % (", ".join(map(repr, args)),),
     "one_of": lambda args: "Must be one of %r" % args,
-    "undefined": "undefined validation error"
+    "undefined": "Undefined validation error"
 }
 
 

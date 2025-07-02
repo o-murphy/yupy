@@ -17,11 +17,11 @@ def reset_locale():
 def test_initial_locale_content():
     """Test that the initial locale dictionary contains expected keys and values."""
     assert "undefined" in locale
-    assert locale["undefined"] == "undefined validation error"
+    assert locale["undefined"] == "Undefined validation error"
     assert "const" in locale
     assert callable(locale["const"])
     assert "required" in locale
-    assert locale["required"] == "Field is required"
+    assert locale["required"] == "Value is required"
 
 
 def test_set_locale_with_new_values():
@@ -39,7 +39,7 @@ def test_set_locale_with_new_values():
     # Pass a tuple to the lambda, as it expects args to be an iterable to access args[0]
     assert locale["const"](("value",)) == "Custom const message for value"
     assert "required" in locale  # Ensure other keys are still present
-    assert locale["required"] == "Field is required"
+    assert locale["required"] == "Value is required"
 
 
 def test_set_locale_with_none():
@@ -52,7 +52,7 @@ def test_set_locale_with_none():
 
 def test_get_error_message_for_existing_key_string():
     """Test retrieving an existing error message that is a string."""
-    assert get_error_message("required") == "Field is required"
+    assert get_error_message("required") == "Value is required"
 
 
 def test_get_error_message_for_existing_key_callable():
@@ -70,14 +70,14 @@ def test_get_error_message_for_non_existent_key():
 
 def test_get_error_message_for_undefined_key():
     """Test retrieving the message for the 'undefined' key."""
-    assert get_error_message("undefined") == "undefined validation error"
+    assert get_error_message("undefined") == "Undefined validation error"
 
 
 def test_get_error_message_after_locale_update():
     """Test get_error_message behavior after locale has been updated."""
     set_locale({"custom_error": "This is a custom message"})
     assert get_error_message("custom_error") == "This is a custom message"
-    assert get_error_message("undefined") == "undefined validation error"  # Original undefined should still be there
+    assert get_error_message("undefined") == "Undefined validation error"  # Original undefined should still be there
 
     set_locale({"undefined": "New default error"})
     assert get_error_message("undefined") == "New default error"

@@ -35,18 +35,22 @@ class MappingSchema(EqualityComparableSchema):
         self._fields = fields
         return self
 
-    def strict(self, message: ErrorMessage = locale['strict']) -> Self:
+    def strict(self, is_strict: bool = True, message: ErrorMessage = locale['strict']) -> Self:
+        if not is_strict:
+            # If not strict, do not apply the test
+            return self
+
         def _(x: dict) -> None:
             defined_keys = set(self._fields.keys())
             input_keys = set(x.keys())
 
             unknown_keys = input_keys - defined_keys
-            print(defined_keys, input_keys)
+            # print(defined_keys, input_keys) # Keep for debugging if needed
 
             if unknown_keys:
                 raise ValidationError(
                     Constraint("strict", message, list(unknown_keys)),
-                    invalid_value=x
+                    invalid_value=x # The whole dictionary is the invalid value in this case
                 )
 
         return self.test(_)
@@ -62,18 +66,24 @@ class MappingSchema(EqualityComparableSchema):
                         path: str = "~") -> MutableMapping[str, Any]:
 
         errs: list[ValidationError] = []
-        for key, field in self._fields.items():
+        for key, field_schema in self._fields.items(): # Renamed 'field' to 'field_schema' to avoid confusion with dataclasses.field
             path_ = concat_path(path, key)
             try:
-                value[key] = field.validate(value.get(key, _REQUIRED_UNDEFINED_), abort_early, path_)
+                # Pass _REQUIRED_UNDEFINED_ if key is not in value
+                field_value = value.get(key, _REQUIRED_UNDEFINED_)
+                value[key] = field_schema.validate(field_value, abort_early, path_)
             except ValidationError as err:
                 if abort_early:
-                    raise ValidationError(err.constraint, path_, invalid_value=value)
-                errs.append(err)
+                    # When abort_early is True, re-raise the original error with the correct path and invalid_value
+                    # The original err.path is already correct
+                    raise err
+                errs.append(err) # Append the original error to collect all
+
         if errs:
+            # When collecting errors, the main error describes the object itself being invalid
             raise ValidationError(
-                Constraint('object', 'invalid object', path),
-                path, errs, invalid_value=value
+                Constraint('mapping', locale['mapping']), # Use locale for 'object' message
+                path, errs, invalid_value=value # Pass the original value as the invalid_value for the object itself
             )
         return value
 

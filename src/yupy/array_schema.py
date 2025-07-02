@@ -48,7 +48,7 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
                 validated_result.append(validated_item)
             except ValidationError as err:
                 if abort_early:
-                    raise ValidationError(err.constraint, item_path, invalid_value=item, errors=err._errors)
+                    raise err
                 else:
                     errs.append(err)
                     validated_result.append(item)

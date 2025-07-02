@@ -5,6 +5,7 @@ from typing_extensions import Self
 
 from yupy.ischema import TransformFunc, ValidatorFunc, _SchemaExpectedType
 from yupy.locale import locale
+from yupy.adapters import _REQUIRED_UNDEFINED_
 from yupy.validation_error import ErrorMessage, ValidationError, Constraint
 
 __all__ = ('Schema',)
@@ -66,6 +67,9 @@ class Schema:  # Implement ISchema
     def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
         try:
             self._nullable_check(value)
+
+            if value is _REQUIRED_UNDEFINED_:
+                value = None
 
             if value is None and self._nullability:
                 return None
