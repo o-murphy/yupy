@@ -31,12 +31,16 @@ rUrl_pattern = re.compile(
 class StringSchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=str)
 
-    # def matches(self, regex: re.Pattern, message: ErrorMessage, exclude_empty: bool = False) -> Schema:
-    #     def _(x: str):
-    #         if not re.match(regex, x):
-    #             raise ValidationError(message)
-    #     self._validators.append(_)
-    #     return self
+    def matches(self, regex: re.Pattern, message: ErrorMessage = locale["matches"],
+                exclude_empty: bool = False) -> Self:
+        def _(x: str) -> None:
+            if exclude_empty and not x:
+                return
+
+            if not re.match(regex, x):
+                raise ValidationError(Constraint("matches", message, regex.pattern), invalid_value=x)
+
+        return self.test(_)
 
     def email(self, message: ErrorMessage = locale["email"]) -> Self:
         def _(x: str) -> None:

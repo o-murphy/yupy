@@ -66,6 +66,10 @@ class Schema:  # Implement ISchema
     def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
         try:
             self._nullable_check(value)
+
+            if value is None and self._nullability:
+                return None
+
             transformed = self._transform(value)
             self._type_check(transformed)
 

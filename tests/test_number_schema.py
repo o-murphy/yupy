@@ -1,0 +1,234 @@
+# File: test_number_schema.py
+import pytest
+from unittest.mock import patch, MagicMock
+from yupy.number_schema import NumberSchema
+from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
+from yupy.schema import Schema
+from yupy.validation_error import ValidationError, Constraint
+from yupy.locale import locale, set_locale
+from typing import Any, List, Callable, Tuple
+
+
+# Fixture to ensure isolation of tests that might modify the global 'locale'
+@pytest.fixture(autouse=True)
+def reset_locale_for_number_schema_tests():
+    original_locale = locale.copy()
+    yield
+    locale.clear()
+    locale.update(original_locale)
+
+
+def test_number_schema_inheritance():
+    """Test that NumberSchema inherits correctly."""
+    schema = NumberSchema()
+    assert isinstance(schema, ComparableSchema)
+    assert isinstance(schema, EqualityComparableSchema)
+    assert isinstance(schema, Schema)
+    assert schema._type == (float, int)
+
+
+def test_number_schema_default_type_check_success():
+    """Test that NumberSchema correctly validates default numeric types."""
+    schema = NumberSchema()
+    assert schema.validate(10) == 10
+    assert schema.validate(10.5) == 10.5
+
+
+def test_number_schema_default_type_check_failure():
+    """Test that NumberSchema correctly fails for non-numeric types."""
+    schema = NumberSchema()
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate("abc")
+    assert excinfo.value.constraint.type == "type"
+    assert excinfo.value.invalid_value == "abc"
+    expected_message = locale["type"](((float, int), type("abc")))
+    assert excinfo.value.constraint.format_message == expected_message
+
+
+def test_positive_success():
+    """Test positive() method for successful validation."""
+    schema = NumberSchema().positive()
+    assert schema.validate(1) == 1
+    assert schema.validate(0.001) == 0.001
+    assert schema.validate(100) == 100
+
+
+def test_positive_failure():
+    """Test positive() method for failed validation."""
+    schema = NumberSchema().positive()
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(0)
+    assert excinfo.value.constraint.type == "gt"
+    assert excinfo.value.path == "~"
+    assert excinfo.value.invalid_value == 0
+    # Corrected expectation: positive() uses its own locale message
+    expected_message = locale["positive"]
+    assert excinfo.value.constraint.format_message == expected_message
+
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(-5)
+    assert excinfo.value.constraint.type == "gt"
+    assert excinfo.value.invalid_value == -5
+    # Corrected expectation for negative value as well
+    assert excinfo.value.constraint.format_message == expected_message
+
+
+def test_positive_with_custom_message():
+    """Test positive() method with a custom error message."""
+    custom_message = "Value must be strictly greater than zero!"
+    schema = NumberSchema().positive(message=custom_message)
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(-10)
+    assert excinfo.value.constraint.message == custom_message
+
+
+def test_negative_success():
+    """Test negative() method for successful validation."""
+    schema = NumberSchema().negative()
+    assert schema.validate(-1) == -1
+    assert schema.validate(-0.001) == -0.001
+    assert schema.validate(-100) == -100
+
+
+def test_negative_failure():
+    """Test negative() method for failed validation."""
+    schema = NumberSchema().negative()
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(0)
+    assert excinfo.value.constraint.type == "lt"
+    assert excinfo.value.invalid_value == 0
+    expected_message = locale["negative"]
+    assert excinfo.value.constraint.format_message == expected_message
+
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(5)
+    assert excinfo.value.constraint.type == "lt"
+    assert excinfo.value.invalid_value == 5
+    assert excinfo.value.constraint.format_message == expected_message
+
+
+def test_negative_with_custom_message():
+    """Test negative() method with a custom error message."""
+    custom_message = "Value must be strictly less than zero!"
+    schema = NumberSchema().negative(message=custom_message)
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(10)
+    assert excinfo.value.constraint.message == custom_message
+
+
+def test_integer_success():
+    """Test integer() method for successful validation."""
+    schema = NumberSchema().integer()
+    assert schema.validate(5) == 5
+    assert schema.validate(0) == 0
+    assert schema.validate(-10) == -10
+
+
+def test_integer_failure():
+    """Test integer() method for failed validation."""
+    schema = NumberSchema().integer()
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(5.5)
+    assert excinfo.value.constraint.type == "integer"
+    assert excinfo.value.path == "~"
+    assert excinfo.value.invalid_value == 5.5
+    expected_message = locale["integer"]
+    assert excinfo.value.constraint.format_message == expected_message
+
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(-1.23)
+    assert excinfo.value.constraint.type == "integer"
+    assert excinfo.value.invalid_value == -1.23
+    assert excinfo.value.constraint.format_message == expected_message
+
+
+def test_integer_with_custom_message():
+    """Test integer() method with a custom error message."""
+    custom_message = "Number must be a whole number!"
+    schema = NumberSchema().integer(message=custom_message)
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(99.9)
+    assert excinfo.value.constraint.message == custom_message
+
+
+def test_multiple_of_success():
+    """Test multiple_of() method for successful validation."""
+    schema = NumberSchema().multiple_of(5)
+    assert schema.validate(10) == 10
+    assert schema.validate(0) == 0
+    assert schema.validate(-15) == -15
+
+    schema_float_multiplier = NumberSchema().multiple_of(0.5)
+    assert schema_float_multiplier.validate(2.0) == 2.0
+    assert schema_float_multiplier.validate(2.5) == 2.5
+
+
+def test_multiple_of_failure():
+    """Test multiple_of() method for failed validation."""
+    schema = NumberSchema().multiple_of(3)
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(7)
+    assert excinfo.value.constraint.type == "multiple_of"
+    assert excinfo.value.path == "~"
+    assert excinfo.value.invalid_value == 7
+    expected_message = locale["multiple_of"]((3,))
+    assert excinfo.value.constraint.format_message == expected_message
+
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(10)
+    assert excinfo.value.constraint.type == "multiple_of"
+    assert excinfo.value.invalid_value == 10
+    assert excinfo.value.constraint.format_message == expected_message
+
+
+    schema_float_multiplier = NumberSchema().multiple_of(0.3)
+    with pytest.raises(ValidationError) as excinfo:
+        schema_float_multiplier.validate(1.0) # 1.0 is not a multiple of 0.3
+    assert excinfo.value.constraint.type == "multiple_of"
+    assert excinfo.value.invalid_value == 1.0
+    expected_message_float = locale["multiple_of"]((0.3,))
+    assert excinfo.value.constraint.format_message == expected_message_float
+
+
+def test_multiple_of_with_custom_message():
+    """Test multiple_of() method with a custom error message."""
+    custom_message = "Value is not a multiple of 7!"
+    schema = NumberSchema().multiple_of(7, message=custom_message)
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(10)
+    assert excinfo.value.constraint.message == custom_message
+
+
+def test_number_schema_nullable_behavior():
+    """Test nullable behavior with NumberSchema methods."""
+    # Test positive() with nullable and None
+    schema_positive_nullable = NumberSchema().nullable().positive()
+    assert schema_positive_nullable.validate(None) is None
+    assert schema_positive_nullable.validate(10) == 10
+    with pytest.raises(ValidationError):
+        schema_positive_nullable.validate(-5)
+
+    # Test integer() with nullable and None
+    schema_integer_nullable = NumberSchema().nullable().integer()
+    assert schema_integer_nullable.validate(None) is None
+    assert schema_integer_nullable.validate(5) == 5
+    with pytest.raises(ValidationError):
+        schema_integer_nullable.validate(5.5)
+
+    # Test multiple_of() with nullable and None
+    schema_multiple_of_nullable = NumberSchema().nullable().multiple_of(2)
+    assert schema_multiple_of_nullable.validate(None) is None
+    assert schema_multiple_of_nullable.validate(4) == 4
+    with pytest.raises(ValidationError):
+        schema_multiple_of_nullable.validate(3)
+
+    # Test non-nullable behavior (default)
+    schema_positive_not_nullable = NumberSchema().positive()
+    with pytest.raises(ValidationError) as excinfo:
+        schema_positive_not_nullable.validate(None)
+    assert excinfo.value.constraint.type == "nullable"
+
+    schema_integer_not_nullable = NumberSchema().integer()
+    with pytest.raises(ValidationError) as excinfo:
+        schema_integer_not_nullable.validate(None)
+    assert excinfo.value.constraint.type == "nullable"

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, List, Iterable, Union, Tuple, MutableMapping
+from typing import Any, List, Union, Optional
 
 from typing_extensions import Self
 
@@ -8,7 +8,6 @@ from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.isized_schema import SizedSchema
 from yupy.locale import locale
-from yupy.schema import Schema
 from yupy.util.concat_path import concat_path
 from yupy.validation_error import ErrorMessage, Constraint, ValidationError
 
@@ -19,7 +18,7 @@ __all__ = ('ArraySchema',)
 class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
     _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
     _fields: List[Union[ISchema, ISchemaAdapter]] = field(init=False, default_factory=list)
-    _of_schema_type: Union[ISchema, ISchemaAdapter] = field(init=False, default_factory=Schema)
+    _of_schema_type: Optional[Union[ISchema, ISchemaAdapter]] = field(init=False, default=None)
 
     def of(self, schema: Union[ISchema, ISchemaAdapter], message: ErrorMessage = locale["array_of"]) -> Self:
         if not isinstance(schema, (ISchema, ISchemaAdapter)):
@@ -29,25 +28,40 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
 
     def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
         value = super().validate(value, abort_early, path)
+        if value is None and self._nullability:
+            return None
         return self._validate_array(value, abort_early, path)  # Convert tuple to list for iteration
 
-    def _validate_array(self, value: MutableMapping[int, Any], abort_early: bool = True,
-                        path: str = "~") -> Iterable:
+    def _validate_array(self, value: Union[list, tuple], abort_early: bool = True,
+                        path: str = "~") -> Union[list, tuple]:
+        if self._of_schema_type is None:
+            return value
+
         errs: List[ValidationError] = []
-        for i, v in enumerate(value):
-            path_ = concat_path(path, i)
+        validated_result = []
+        original_type = type(value)
+
+        for i, item in enumerate(value):
+            item_path = concat_path(path, i)
             try:
-                value[i] = self._of_schema_type.validate(v, abort_early, path_)
+                validated_item = self._of_schema_type.validate(item, abort_early, item_path)
+                validated_result.append(validated_item)
             except ValidationError as err:
                 if abort_early:
-                    raise ValidationError(err.constraint, path_, invalid_value=v)
+                    raise ValidationError(err.constraint, item_path, invalid_value=item, errors=err._errors)
                 else:
                     errs.append(err)
+                    validated_result.append(item)
+
         if errs:
             raise ValidationError(
-                Constraint('array', 'invalid array', path),
-                path, errs, invalid_value=value)
-        return value
+                Constraint('array', locale["array"], path),
+                path, errs, invalid_value=value
+            )
+
+        if original_type is tuple:
+            return tuple(validated_result)
+        return validated_result
 
     def __getitem__(self, item: int) -> Union[ISchema, ISchemaAdapter]:
         return self._fields[item]

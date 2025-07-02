@@ -24,6 +24,7 @@ class MixedSchema(EqualityComparableSchema):
                     Constraint("type", message, type_, type(x)),
                     invalid_value=x
                 )
+
         return self.test(_)
 
     def one_of(self, items: Iterable, message: ErrorMessage = locale['one_of']) -> Self:

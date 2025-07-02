@@ -22,12 +22,16 @@ class UnionSchema(EqualityComparableSchema):
     def one_of(self, options: UnionOptionsType, message: ErrorMessage = locale["one_of"]) -> Self:
         for schema in options:
             if not isinstance(schema, ISchema):
-                raise ValidationError(Constraint("one_of", message, type(schema)), invalid_value=schema)
+                raise ValidationError(Constraint("one_of",
+                                      message, type(schema)),
+                                      invalid_value=schema)
         self._options = options
         return self
 
     def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
         value = super().validate(value, abort_early, path)
+        if value is None and self._nullability:
+            return None
         return self._validate_union(value, abort_early, path)  # Convert tuple to list for iteration
 
     def _validate_union(self, value: Any, abort_early: bool = True,
@@ -38,11 +42,16 @@ class UnionSchema(EqualityComparableSchema):
             path_ = concat_path(path, i)
             try:
                 matching_value = opt.validate(value, abort_early, path_)
+                # If an option successfully validates, we've found a match
+                return matching_value
             except ValidationError as err:
                 errs.append(err)
 
-        if len(errs) >= len(self._options):
+        # If we reach here and no match was found, raise a Union-specific error
+        if len(errs) >= len(self._options): # This condition will always be true if no option matched
             raise ValidationError(
-                Constraint('one_of', 'not match any expected Schema', path),
-                path, errs, invalid_value=value)
-        return matching_value
+                Constraint('one_of', locale["one_of"], path), # The path passed to the constraint should reflect the current union path
+                path, errs, invalid_value=value
+            )
+        # This part should ideally not be reached if no option matched and errs were collected
+        return matching_value # Fallback,

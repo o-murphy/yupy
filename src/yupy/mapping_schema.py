@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Any, MutableMapping, TypeAlias, Union
+
 from typing_extensions import Self
 
 from yupy.adapters import _REQUIRED_UNDEFINED_, ISchemaAdapter
@@ -27,7 +28,7 @@ class MappingSchema(EqualityComparableSchema):
         for key, item in fields.items():
             if not isinstance(item, (ISchema, ISchemaAdapter)):
                 raise ValidationError(
-                    Constraint("shape_fields", locale["shape_values"]),
+                    Constraint("shape_fields", locale["shape_fields"]),
                     key,
                     invalid_value=item
                 )
@@ -52,6 +53,8 @@ class MappingSchema(EqualityComparableSchema):
 
     def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
         value = super().validate(value, abort_early, path)
+        if value is None and self._nullability:
+            return None
         return self._validate_shape(value, abort_early, path)
 
     def _validate_shape(self, value: MutableMapping[str, Any],

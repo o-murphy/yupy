@@ -1,11 +1,13 @@
-from typing import Optional, Literal, TypedDict
-
-from yupy.validation_error import ErrorMessage
+from typing import Optional, Literal, TypedDict, TypeAlias, Union, Callable, Any, List
 
 __all__ = (
     'locale',
-    'set_locale'
+    'set_locale',
+    'get_error_message',
+    'ErrorMessage',
 )
+
+ErrorMessage: TypeAlias = Union[str, Callable[[Any | List[Any]], str]]
 
 
 class Locale(TypedDict, total=False):
@@ -15,6 +17,7 @@ class Locale(TypedDict, total=False):
     max: ErrorMessage
     length: ErrorMessage
     required: ErrorMessage
+    nullable: ErrorMessage
     not_nullable: ErrorMessage
     test: ErrorMessage
     matches: ErrorMessage
@@ -33,6 +36,7 @@ class Locale(TypedDict, total=False):
     multiple_of: ErrorMessage
     positive: ErrorMessage
     negative: ErrorMessage
+    array: ErrorMessage
     array_of: ErrorMessage
     shape: ErrorMessage
     shape_fields: ErrorMessage
@@ -42,10 +46,10 @@ class Locale(TypedDict, total=False):
 
 
 LocaleKey = Literal[
-    "const", "type", "min", "max", "length", "required", "not_nullable", "test", "matches",
+    "const", "type", "min", "max", "length", "required", "nullable", "not_nullable", "test", "matches",
     "email", "url", "uuid", "lowercase", "uppercase",
     "le", "ge", "lt", "gt", "eq", "ne",
-    "integer", "multiple_of", "positive", "negative", "array_of", "shape",
+    "integer", "multiple_of", "positive", "negative", "array", "array_of", "shape",
     "shape_fields", "strict", "one_of", "undefined"
 ]
 
@@ -58,6 +62,7 @@ locale: Locale = {
     "uppercase": "Value must be an uppercase string",
     "lowercase": "Value must be a lowercase string",
     "required": "Field is required",
+    "nullable": "Value can't be null",
     "not_nullable": "Value can't be null",
     "test": "Test failed",
     'matches': "Don't match regex",  # FIXME
@@ -73,7 +78,8 @@ locale: Locale = {
     "positive": "Value must be positive, a.g. > 0",
     "negative": "Value must be positive, a.g. < 0",
     "integer": "Value must be valid 'int', got 'float'",
-    "array_of": lambda args: "Schema must be a type of Schema, got %r" % args,
+    "array": "invalid array",
+    "array_of": lambda args: "Schema must be a type of ISchema or ISchemaAdapter, got %r" % args,
     "multiple_of": lambda args: "Value must be a multiple of %r" % args,
     "shape": "'shape' must be a type of 'Shape'",
     "shape_fields": "all shape items must have a values of type of Schema",
