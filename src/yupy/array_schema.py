@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, List, Iterable, Union
+from typing import Any, List, Iterable, Union, Tuple, MutableMapping
 
 from typing_extensions import Self
 
@@ -31,13 +31,13 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
         value = super().validate(value, abort_early, path)
         return self._validate_array(value, abort_early, path)  # Convert tuple to list for iteration
 
-    def _validate_array(self, value: Iterable, abort_early: bool = True,
+    def _validate_array(self, value: MutableMapping[int, Any], abort_early: bool = True,
                         path: str = "~") -> Iterable:
         errs: List[ValidationError] = []
         for i, v in enumerate(value):
             path_ = concat_path(path, i)
             try:
-                value = self._of_schema_type.validate(v, abort_early, path_)
+                value[i] = self._of_schema_type.validate(v, abort_early, path_)
             except ValidationError as err:
                 if abort_early:
                     raise ValidationError(err.constraint, path_, invalid_value=v)
