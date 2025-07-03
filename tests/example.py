@@ -1,21 +1,23 @@
 from yupy import mixed, string, number, array, mapping
+from yupy.adapters import required
 from yupy.validation_error import ValidationError
 
 if __name__ == "__main__":
 
     s = string().max(5).min(2).lowercase()
-    n = number().required().integer().ge(10).le(100).multiple_of(30)
-    l = array().required().of(s).min(2)
+    # n = number().required().integer().ge(10).le(100).multiple_of(30)
+    n = required(number().integer().ge(10).le(100).multiple_of(30))
+    l = required(array().of(s).min(2))
 
     s.validate("ab")
     n.validate(60)
 
     shp = mapping().shape(
         {
-            "email": string().email().required(),
+            "email": required(string().email()),
             "s": s,
             "n": n,
-            "shp": mapping()
+            "shp": required(mapping()
             .shape(
                 {
                     "s": s,
@@ -23,8 +25,7 @@ if __name__ == "__main__":
                     # 'l': l,
                     "o": mapping().shape({"n": l}),
                 }
-            )
-            .required(),
+            ))
         }
     )
 

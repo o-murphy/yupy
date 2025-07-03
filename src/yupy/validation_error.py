@@ -1,15 +1,15 @@
 from dataclasses import dataclass, field
-from typing import Generator, Any, List, Optional, Union, Callable, TypeAlias
+from typing import Generator, Any, List, Optional, Union
+
+from yupy.locale import get_error_message, ErrorMessage
 
 __all__ = (
-    'ErrorMessage',
     'ValidationError',
     'Constraint',
+    '_EMPTY_MESSAGE_',
 )
 
-from typing_extensions import Self
-
-ErrorMessage: TypeAlias = Union[str, Callable[[Any | List[Any]], str]]
+_EMPTY_MESSAGE_: ErrorMessage = ""
 
 
 @dataclass
@@ -20,13 +20,12 @@ class Constraint:
 
     def __init__(self,
                  type: Optional[str],
-                 message: Optional[ErrorMessage] = None,
+                 message: Optional[ErrorMessage] = _EMPTY_MESSAGE_,
                  *args: Any,
                  ):
         self.type = type or "undefined"
         self.args = args
-        if not message:
-            from yupy.locale import get_error_message
+        if message is None or message is _EMPTY_MESSAGE_: # Check against _EMPTY_MESSAGE_ for default behavior
             self.message = get_error_message("undefined")
         else:
             self.message = message

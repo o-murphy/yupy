@@ -1,22 +1,31 @@
 from .array_schema import *
-from .icomparable_schema import IComparableSchema, ComparableSchema
-from .ischema import ISchema
-from .isized_schema import ISizedSchema, SizedSchema
+from .icomparable_schema import *
+from .ischema import *
+from .isized_schema import *
 from .locale import *
 from .mapping_schema import *
 from .mixed_schema import *
 from .number_schema import *
 from .schema import *
 from .string_schema import *
+from .union_schema import *
 from .validation_error import *
+from .adapters import *
 
 string = StringSchema
 number = NumberSchema
 mapping = MappingSchema
 array = ArraySchema
 mixed = MixedSchema
+union = UnionSchema
+
+immutable = SchemaImmutableAdapter
+default = SchemaDefaultAdapter
+required = SchemaRequiredAdapter
 
 __all__ = (
+    'ErrorMessage',
+    'ValidatorFunc',
     'ValidationError',
     'Constraint',
 
@@ -26,18 +35,33 @@ __all__ = (
     'MappingSchema',
     'ArraySchema',
     'MixedSchema',
+    'UnionSchema',
 
     'ISchema',
     'IComparableSchema',
     'ComparableSchema',
+    'IEqualityComparableSchema',
+    'EqualityComparableSchema',
     'ISizedSchema',
     'SizedSchema',
+
+    'ISchemaAdapter',
+    'SchemaAdapter',
+    'SchemaDefaultAdapter',
+    'SchemaRequiredAdapter',
+    'SchemaImmutableAdapter',
+    '_REQUIRED_UNDEFINED_',
 
     'string',
     'number',
     'mapping',
     'array',
     'mixed',
+    'union',
+
+    'immutable',
+    'required',
+    'default',
 
     'locale',
     'set_locale',
