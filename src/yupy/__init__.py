@@ -1,3 +1,4 @@
+from .adapters import *
 from .array_schema import *
 from .icomparable_schema import *
 from .ischema import *
@@ -10,7 +11,6 @@ from .schema import *
 from .string_schema import *
 from .union_schema import *
 from .validation_error import *
-from .adapters import *
 
 string = StringSchema
 number = NumberSchema

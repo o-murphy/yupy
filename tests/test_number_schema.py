@@ -1,12 +1,11 @@
 # File: test_number_schema.py
 import pytest
-from unittest.mock import patch, MagicMock
-from yupy.number_schema import NumberSchema
+
 from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
+from yupy.locale import locale
+from yupy.number_schema import NumberSchema
 from yupy.schema import Schema
-from yupy.validation_error import ValidationError, Constraint
-from yupy.locale import locale, set_locale
-from typing import Any, List, Callable, Tuple
+from yupy.validation_error import ValidationError
 
 
 # Fixture to ensure isolation of tests that might modify the global 'locale'
@@ -180,10 +179,9 @@ def test_multiple_of_failure():
     assert excinfo.value.invalid_value == 10
     assert excinfo.value.constraint.format_message == expected_message
 
-
     schema_float_multiplier = NumberSchema().multiple_of(0.3)
     with pytest.raises(ValidationError) as excinfo:
-        schema_float_multiplier.validate(1.0) # 1.0 is not a multiple of 0.3
+        schema_float_multiplier.validate(1.0)  # 1.0 is not a multiple of 0.3
     assert excinfo.value.constraint.type == "multiple_of"
     assert excinfo.value.invalid_value == 1.0
     expected_message_float = locale["multiple_of"]((0.3,))

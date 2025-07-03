@@ -42,7 +42,7 @@ def mock_yupy_locale():
 
 def test_mapping_schema_creation():
     schema = MappingSchema()
-    assert schema._type == dict
+    assert schema._type is dict
     assert schema._fields == {}
 
 
@@ -77,16 +77,16 @@ def test_mapping_schema_shape_invalid_field_type():
 
 # region Strict tests
 def test_mapping_schema_strict_true_unknown_keys_fails():
-    schema = MappingSchema().shape({"name": StringSchema()}).strict(True) # Explicitly set strict to True
+    schema = MappingSchema().shape({"name": StringSchema()}).strict(True)  # Explicitly set strict to True
     with pytest.raises(ValidationError) as excinfo:
         schema.validate({"name": "Alice", "extra": 123})
     assert excinfo.value.constraint.type == "strict"
-    assert excinfo.value.path == "~" # Strictness is a check on the object itself
+    assert excinfo.value.path == "~"  # Strictness is a check on the object itself
     assert excinfo.value.constraint.format_message == "Object contains unknown keys: ['extra']"
 
 
 def test_mapping_schema_strict_false_unknown_keys_succeeds():
-    schema = MappingSchema().shape({"name": StringSchema()}).strict(False) # Explicitly set strict to False
+    schema = MappingSchema().shape({"name": StringSchema()}).strict(False)  # Explicitly set strict to False
     value = schema.validate({"name": "Alice", "extra": 123})
     assert value == {"name": "Alice", "extra": 123}
 
@@ -177,7 +177,7 @@ def test_mapping_schema_validate_missing_required_field_abort_early():
         schema.validate({"name": "Frank"})
     assert excinfo.value.constraint.type == "required"
     assert excinfo.value.path == "~/age"
-    assert excinfo.value.invalid_value is _REQUIRED_UNDEFINED_ # The invalid value for a missing required field is None
+    assert excinfo.value.invalid_value is _REQUIRED_UNDEFINED_  # The invalid value for a missing required field is None
     assert excinfo.value.constraint.format_message == "Value is required"
 
 
@@ -190,8 +190,8 @@ def test_mapping_schema_validate_invalid_field_type_abort_early():
         schema.validate({"name": "Grace", "age": "thirty"})
     assert excinfo.value.constraint.type == "type"
     assert excinfo.value.path == "~/age"
-    assert excinfo.value.invalid_value == "thirty" # The invalid value should be 'thirty', not the whole dict
-    assert "Value is not of type " in excinfo.value.constraint.format_message # Order of int, float might vary
+    assert excinfo.value.invalid_value == "thirty"  # The invalid value should be 'thirty', not the whole dict
+    assert "Value is not of type " in excinfo.value.constraint.format_message  # Order of int, float might vary
 
 
 def test_mapping_schema_validate_nested_error_abort_early():
@@ -208,7 +208,7 @@ def test_mapping_schema_validate_nested_error_abort_early():
     with pytest.raises(ValidationError) as excinfo:
         user_schema.validate(data, abort_early=True)
     assert excinfo.value.constraint.type == "length"
-    assert excinfo.value.path == "~/address/zip" # Path should be the specific failing field
+    assert excinfo.value.path == "~/address/zip"  # Path should be the specific failing field
     assert excinfo.value.invalid_value == "123"
     assert "Length must be" in excinfo.value.constraint.format_message
 
@@ -239,12 +239,12 @@ def test_mapping_schema_validate_multiple_errors_collect_all():
     # Check the main error
     assert all_errors[0].path == "~"
     assert all_errors[0].constraint.type == "mapping"
-    assert all_errors[0].constraint.format_message == "Invalid mapping" # Consistent with locale
+    assert all_errors[0].constraint.format_message == "Invalid mapping"  # Consistent with locale
 
     # Check sub-errors (order might vary based on dictionary iteration, but content should be there)
     # Paths should be fully qualified in the collected errors
     error_paths = sorted([e.path for e in all_errors[1:]])
-    assert error_paths == ["~/age", "~/email", "~/name"] # Paths should be fully qualified
+    assert error_paths == ["~/age", "~/email", "~/name"]  # Paths should be fully qualified
 
     name_error = next(e for e in all_errors if e.path == "~/name")
     assert name_error.constraint.type == "type"
@@ -298,12 +298,12 @@ def test_mapping_schema_validate_nested_and_multiple_errors_collect_all():
     assert all_errors[0].constraint.type == "mapping"
 
     # Check age error
-    age_error = next(e for e in all_errors if e.path == "~/age") # Fully qualified path
+    age_error = next(e for e in all_errors if e.path == "~/age")  # Fully qualified path
     assert age_error.constraint.type == "type"
     assert age_error.invalid_value == "twenty"
 
     # Check address object error
-    address_object_error = next(e for e in all_errors if e.path == "~/address") # Fully qualified path
+    address_object_error = next(e for e in all_errors if e.path == "~/address")  # Fully qualified path
     assert address_object_error.constraint.type == "mapping"
 
     # Check nested errors within address (order by path for consistency)

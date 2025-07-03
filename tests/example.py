@@ -1,4 +1,4 @@
-from yupy import mixed, string, number, array, mapping
+from yupy import string, number, array, mapping
 from yupy.adapters import required
 from yupy.validation_error import ValidationError
 
@@ -7,7 +7,7 @@ if __name__ == "__main__":
     s = string().max(5).min(2).lowercase()
     # n = number().required().integer().ge(10).le(100).multiple_of(30)
     n = required(number().integer().ge(10).le(100).multiple_of(30))
-    l = required(array().of(s).min(2))
+    li = required(array().of(s).min(2))
 
     s.validate("ab")
     n.validate(60)
@@ -22,8 +22,8 @@ if __name__ == "__main__":
                 {
                     "s": s,
                     "n": n,
-                    # 'l': l,
-                    "o": mapping().shape({"n": l}),
+                    # 'li': li,
+                    "o": mapping().shape({"n": li}),
                 }
             ))
         }
@@ -36,17 +36,17 @@ if __name__ == "__main__":
                 "email": "a@gmail.com",
                 "s": "wd",
                 "n": 60,
-                "shp": {"n": "a", "l": ["ab", "b"], "o": {"n": ["g", "g"]}},
+                "shp": {"n": "a", "li": ["ab", "b"], "o": {"n": ["g", "g"]}},
             }, False
         )
     except ValidationError as err:
 
         for e in err.errors:
-
             print("Violation:")
             print(f"\tPath\t:\t{e.path}")
             print(f"\tValue\t:\t{e.invalid_value!r}")
             print(f"\tReason\t:\t{e.constraint.format_message}")
+
 
     # m = mixed().one_of(['G1', 'G7'])
     # m.validate('F')
@@ -58,11 +58,13 @@ if __name__ == "__main__":
                     "email": "a@gmail.com",
                     "s": "wd",
                     "n": 60,
-                    "shp": {"n": "a", "l": ["ab", "b"], "o": {"n": ["g", "g"]}},
+                    "shp": {"n": "a", "li": ["ab", "b"], "o": {"n": ["g", "g"]}},
                 }, False
             )
         except ValidationError as err:
-            ...
+            print(err)
+
 
     from timeit import timeit
+
     print(timeit(check, number=100000))

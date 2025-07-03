@@ -1,18 +1,17 @@
-name: Test
+name: Mypy
 
 on:
   pull_request:
-  
+    branches:
+      - '*'
   workflow_dispatch:
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
 
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,4 +25,4 @@ jobs:
         run: uv sync
 
       - name: Run tests
-        run: uv run pytest --cov=yupy --cov-report term
+        run: uv run mypy check

@@ -3,7 +3,6 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from yupy.array_schema import ArraySchema
 from yupy.locale import locale as yupy_actual_locale, get_error_message as yupy_actual_get_error_message
 from yupy.number_schema import NumberSchema
 from yupy.schema import Schema
@@ -37,7 +36,7 @@ def mock_yupy_locale():
 
 def test_union_schema_creation():
     schema = UnionSchema()
-    assert schema._type == object
+    assert schema._type is object
     assert schema._options == []
 
 

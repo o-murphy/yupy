@@ -1,10 +1,12 @@
 # test_string_schema.py
-import pytest
-from unittest.mock import patch, MagicMock
-from yupy.validation_error import ValidationError, Constraint, _EMPTY_MESSAGE_
-from yupy.string_schema import StringSchema
-from typing import List, Any
 import re
+from unittest.mock import patch, MagicMock
+
+import pytest
+
+from yupy.string_schema import StringSchema
+from yupy.validation_error import ValidationError
+
 
 # Patch the locale module for tests that don't explicitly set messages
 # This fixture will run for every test in this module
@@ -26,14 +28,17 @@ def reset_locale_for_string_schema_tests():
         }
         yield mock_locale_module
 
+
 def test_string_schema_creation():
     schema = StringSchema()
-    assert schema._type == str
+    assert schema._type is str
+
 
 def test_string_schema_email_success():
     schema = StringSchema().email()
     assert schema.validate("test@example.com") == "test@example.com"
     assert schema.validate("another.one@sub.domain.co.uk") == "another.one@sub.domain.co.uk"
+
 
 def test_string_schema_email_failure():
     schema = StringSchema().email()
@@ -41,6 +46,7 @@ def test_string_schema_email_failure():
         schema.validate("invalid-email")
     assert excinfo.value.constraint.type == "email"
     assert excinfo.value.invalid_value == "invalid-email"
+
 
 def test_string_schema_email_with_custom_message():
     custom_message = "This is not a valid email address."
@@ -50,10 +56,12 @@ def test_string_schema_email_with_custom_message():
     assert excinfo.value.constraint.type == "email"
     assert excinfo.value.constraint.format_message == custom_message
 
+
 def test_string_schema_url_success():
     schema = StringSchema().url()
     assert schema.validate("http://example.com") == "http://example.com"
     assert schema.validate("https://www.example.co.uk/path?query=1") == "https://www.example.co.uk/path?query=1"
+
 
 def test_string_schema_url_failure():
     schema = StringSchema().url()
@@ -61,6 +69,7 @@ def test_string_schema_url_failure():
         schema.validate("not-a-url")
     assert excinfo.value.constraint.type == "url"
     assert excinfo.value.invalid_value == "not-a-url"
+
 
 def test_string_schema_url_with_custom_message():
     custom_message = "Invalid URL format."
@@ -70,13 +79,15 @@ def test_string_schema_url_with_custom_message():
     assert excinfo.value.constraint.type == "url"
     assert excinfo.value.constraint.format_message == custom_message
 
+
 def test_uuid_success():
-    schema = StringSchema().uuid().not_nullable() # Added not_nullable for explicit clarity, though redundant
+    schema = StringSchema().uuid().not_nullable()  # Added not_nullable for explicit clarity, though redundant
     uuid_str_1 = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
     result = schema.validate(uuid_str_1)
     assert result == uuid_str_1
     assert result is not None  # Explicit check for None
-    assert isinstance(result, str) # Ensure it's a string
+    assert isinstance(result, str)  # Ensure it's a string
+
 
 def test_uuid_failure():
     schema = StringSchema().uuid()
@@ -84,6 +95,7 @@ def test_uuid_failure():
         schema.validate("not-a-uuid")
     assert excinfo.value.constraint.type == "uuid"
     assert excinfo.value.invalid_value == "not-a-uuid"
+
 
 def test_uuid_with_custom_message():
     custom_message = "Must be a valid UUID."
@@ -93,9 +105,11 @@ def test_uuid_with_custom_message():
     assert excinfo.value.constraint.type == "uuid"
     assert excinfo.value.constraint.format_message == custom_message
 
+
 def test_matches_success():
     schema = StringSchema().matches(re.compile(r"^\d{5}$"))
     assert schema.validate("12345") == "12345"
+
 
 def test_matches_failure():
     schema = StringSchema().matches(re.compile(r"^\d{5}$"))
@@ -104,6 +118,7 @@ def test_matches_failure():
     assert excinfo.value.constraint.type == "matches"
     assert excinfo.value.invalid_value == "123"
 
+
 def test_matches_with_custom_message():
     custom_message = "Pattern mismatch."
     schema = StringSchema().matches(re.compile(r"^\d{3}$"), message=custom_message)
@@ -111,6 +126,7 @@ def test_matches_with_custom_message():
         schema.validate("1234")
     assert excinfo.value.constraint.type == "matches"
     assert excinfo.value.constraint.format_message == custom_message
+
 
 def test_matches_exclude_empty():
     # Test with exclude_empty=True and empty string
@@ -133,15 +149,18 @@ def test_matches_exclude_empty():
     assert excinfo.value.constraint.type == "matches"
     assert excinfo.value.invalid_value == ""
 
+
 def test_ensure_transform():
-    schema = StringSchema().ensure() # Removed .nullable()
-    assert schema.validate("") == "" # Changed from validate(None)
+    schema = StringSchema().ensure()  # Removed .nullable()
+    assert schema.validate("") == ""  # Changed from validate(None)
     assert schema.validate("hello") == "hello"
-    assert schema.validate(" ") == " " # Ensure does not trim spaces by default
+    assert schema.validate(" ") == " "  # Ensure does not trim spaces by default
+
 
 def test_lowercase_success():
     schema = StringSchema().lowercase()
     assert schema.validate("hello") == "hello"
+
 
 def test_lowercase_failure():
     schema = StringSchema().lowercase()
@@ -149,6 +168,7 @@ def test_lowercase_failure():
         schema.validate("Hello")
     assert excinfo.value.constraint.type == "lowercase"
     assert excinfo.value.invalid_value == "Hello"
+
 
 def test_lowercase_with_custom_message():
     custom_message = "String must be all lowercase."
@@ -158,9 +178,11 @@ def test_lowercase_with_custom_message():
     assert excinfo.value.constraint.type == "lowercase"
     assert excinfo.value.constraint.format_message == custom_message
 
+
 def test_uppercase_success():
     schema = StringSchema().uppercase()
     assert schema.validate("HELLO") == "HELLO"
+
 
 def test_uppercase_failure():
     schema = StringSchema().uppercase()
@@ -168,6 +190,7 @@ def test_uppercase_failure():
         schema.validate("World")
     assert excinfo.value.constraint.type == "uppercase"
     assert excinfo.value.invalid_value == "World"
+
 
 def test_uppercase_with_custom_message():
     custom_message = "String must be all uppercase."
@@ -177,9 +200,11 @@ def test_uppercase_with_custom_message():
     assert excinfo.value.constraint.type == "uppercase"
     assert excinfo.value.constraint.format_message == custom_message
 
+
 def test_length_success():
     schema = StringSchema().length(5)
     assert schema.validate("abcde") == "abcde"
+
 
 def test_length_failure():
     schema = StringSchema().length(5)
@@ -188,10 +213,12 @@ def test_length_failure():
     assert excinfo.value.constraint.type == "length"
     assert excinfo.value.invalid_value == "abcd"
 
+
 def test_min_length_success():
     schema = StringSchema().min(3)
     assert schema.validate("abc") == "abc"
     assert schema.validate("abcd") == "abcd"
+
 
 def test_min_length_failure():
     schema = StringSchema().min(3)
@@ -200,10 +227,12 @@ def test_min_length_failure():
     assert excinfo.value.constraint.type == "min"
     assert excinfo.value.invalid_value == "ab"
 
+
 def test_max_length_success():
     schema = StringSchema().max(5)
     assert schema.validate("abcde") == "abcde"
     assert schema.validate("abcd") == "abcd"
+
 
 def test_max_length_failure():
     schema = StringSchema().max(5)
