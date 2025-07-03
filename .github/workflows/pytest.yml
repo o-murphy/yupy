@@ -1,66 +1,44 @@
-name: Pytest
-
-on:
+name: Pyteston:
   pull_request:
-  
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    permissions: # Add this block
-      contents: write # Grant write permission for repository contents
-
+    permissions:
+      contents: write # Keep this, it's necessary for write access
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
       - name: Install uv
         uses: astral-sh/setup-uv@v6
-
       - name: Install dependencies
         run: uv sync
-
       - name: Run tests
         run: uv run pytest --cov=yupy --cov-report term --cov-report=json:coverage.json
-
       - name: Install "coverage-badge"
         run: uv pip install coverage-badge
-
       - name: Generate coverage badge
         run: |
-          rm -rf coverage.svg
+          rm coverage.svg
           uv run coverage-badge -o coverage.svg
-
       - name: Commit and push coverage badge
-        # This step will only run if the workflow was triggered by a manual dispatch
-        # or a push event (if you add 'push' to the 'on' block).
-        # It avoids running on pull_request events to prevent infinite loops and permission issues with forks.
-        # if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: |
-          # Configure Git user details for the commit
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Check if the coverage.svg file has actually changed
           if git diff --quiet coverage.svg; then
             echo "No changes to coverage.svg. Skipping commit."
           else
-            # Add the changed file to Git staging area
             git add coverage.svg
             git add coverage.json
-            # Commit the changes
             git commit -m "Update coverage badge"
-            # Push the changes to the current branch (HEAD)
-            git push origin HEAD
+            # --- FIX IS HERE ---
+            git push origin "$GITHUB_REF_NAME" # Push to the current branch name
             echo "Coverage badge updated and pushed."
           fi
         env:
-          # The GITHUB_TOKEN is automatically provided by GitHub Actions
-          # and has permissions to push to the repository for push/workflow_dispatch events.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
