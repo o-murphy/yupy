@@ -5,13 +5,13 @@
 [![license]][LGPL-3]
 [![pypi]][PyPiUrl]
 [![pypi-pre]][pypi-pre-url]
-[![downloads]][pepy]
-[![downloads/month]][pepy]
-[![coverage]][coverage]
 [![py-versions]][sources]
 [![Test](https://github.com/o-murphy/yupy/actions/workflows/pytest.yml/badge.svg)](https://github.com/o-murphy/yupy/actions/workflows/pytest.yml)
 [![Ruff](https://github.com/o-murphy/yupy/actions/workflows/mypy.yml/badge.svg)](https://github.com/o-murphy/yupy/actions/workflows/mypy.yml)
 [![Mypy](https://github.com/o-murphy/yupy/actions/workflows/ruff.yml/badge.svg)](https://github.com/o-murphy/yupy/actions/workflows/ruff.yml)
+[![coverage]][coverage]
+[![downloads]][pepy]
+[![downloads/month]][pepy]
 [![Made in Ukraine]][SWUBadge]
 
 [sources]:

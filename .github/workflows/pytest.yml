@@ -32,7 +32,9 @@ jobs:
         run: uv pip install coverage-badge
 
       - name: Generate coverage badge
-        run: uv run coverage-badge -o coverage.svg
+        run: |
+          rm -rf coverage.svg
+          uv run coverage-badge -o coverage.svg
 
       - name: Commit and push coverage badge
         # This step will only run if the workflow was triggered by a manual dispatch
