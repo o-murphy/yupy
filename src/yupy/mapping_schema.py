@@ -54,20 +54,17 @@ class MappingSchema(EqualityComparableSchema):
             Self: The schema instance, allowing for method chaining.
 
         Raises:
-            ValidationError: If `fields` is not a dictionary or if any value
+            TypeError: If `fields` is not a dictionary or if any value
                 in `fields` is not an `ISchema` or `ISchemaAdapter` instance.
         """
         if not isinstance(fields, dict):
-            raise ValidationError(
-                Constraint("shape", locale["shape"])
-            )
+            raise TypeError("Shape definition must be a dictionary.")
         for key, item in fields.items():
+            # TODO: possibly need check if keys are immutable
+            # if not isinstance(key, (int, str, Enum)):
+            #     raise TypeError("each shape key must be an instance of int or str")
             if not isinstance(item, (ISchema, ISchemaAdapter)):
-                raise ValidationError(
-                    Constraint("shape_fields", locale["shape_fields"]),
-                    key,
-                    invalid_value=item
-                )
+                raise TypeError("each shape value must be an instance of ISchema or ISchemaAdapter")
         self._fields = fields
         return self
 

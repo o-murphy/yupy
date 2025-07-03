@@ -35,11 +35,8 @@ def test_union_schema_one_of_success():
 
 
 def test_union_schema_one_of_invalid_schema_type():
-    with pytest.raises(ValidationError) as excinfo:
+    with pytest.raises(TypeError):
         UnionSchema().one_of([StringSchema(), "invalid"])
-    assert excinfo.value.constraint.type == "one_of"
-    assert excinfo.value.invalid_value == "invalid"
-    assert "Must be one of " in excinfo.value.constraint.format_message
 
 
 def test_union_schema_validate_with_string_success():

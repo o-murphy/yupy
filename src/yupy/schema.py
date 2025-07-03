@@ -27,6 +27,7 @@ class Schema:
     are built.
 
     Attributes:
+        message (ErrorMessage): message of type ValidationError
         _type (_SchemaExpectedType): The expected Python type(s) for the schema's value.
             Defaults to `object`, meaning any type is initially allowed.
         _transforms (List[TransformFunc]): A list of transformation functions
@@ -38,6 +39,7 @@ class Schema:
         _not_nullable (ErrorMessage): The error message to use when a non-nullable
             field receives `None`. Defaults to the locale-defined message for "not_nullable".
     """
+    message: ErrorMessage = field(default=locale['type'])
     _type: _SchemaExpectedType = field(default=object)
     _transforms: List[TransformFunc] = field(init=False, default_factory=list)
     _validators: List[ValidatorFunc] = field(init=False, default_factory=list)
@@ -115,7 +117,7 @@ class Schema:
             return
         if not isinstance(value, type_):
             raise ValidationError(
-                Constraint("type", locale["type"], type_, type(value)),
+                Constraint("type", self.message, type_, type(value)),
                 invalid_value=value
             )
 

@@ -7,7 +7,7 @@ from yupy.adapters import ISchemaAdapter
 from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType, ISchema
 from yupy.isized_schema import SizedSchema
-from yupy.locale import locale, ErrorMessage
+from yupy.locale import locale
 from yupy.util.concat_path import concat_path
 from yupy.validation_error import Constraint, ValidationError
 
@@ -39,7 +39,7 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
     _fields: List[Union[ISchema, ISchemaAdapter]] = field(init=False, default_factory=list)
     _of_schema_type: Optional[Union[ISchema, ISchemaAdapter]] = field(init=False, default=None)
 
-    def of(self, schema: Union[ISchema, ISchemaAdapter], message: ErrorMessage = locale["array_of"]) -> Self:
+    def of(self, schema: Union[ISchema, ISchemaAdapter]) -> Self:
         """
         Specifies the schema that each element in the array must conform to.
 
@@ -54,11 +54,12 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
             Self: The schema instance, allowing for method chaining.
 
         Raises:
-            ValidationError: If the provided `schema` is not an instance of
+            TypeError: If the provided `schema` is not an instance of
                 `ISchema` or `ISchemaAdapter`.
         """
         if not isinstance(schema, (ISchema, ISchemaAdapter)):
-            raise ValidationError(Constraint("array_of", message, type(schema)), invalid_value=schema)
+            raise TypeError("schema must be an instance of ISchema or ISchemaAdapter")
+
         self._of_schema_type = schema
         return self
 

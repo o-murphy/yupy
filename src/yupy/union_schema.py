@@ -58,9 +58,7 @@ class UnionSchema(EqualityComparableSchema):
         """
         for schema in options:
             if not isinstance(schema, ISchema):
-                raise ValidationError(Constraint("one_of",
-                                                 message, type(schema)),
-                                      invalid_value=schema)
+                raise TypeError("each union schema must be an instance of ISchema or ISchemaAdapter")
         self._options = options
         return self
 

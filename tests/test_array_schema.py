@@ -16,7 +16,6 @@ def reset_locale_for_array_schema_tests():
     with patch('yupy.locale') as mock_locale_module:
         mock_locale_module.get_error_message = MagicMock(return_value="Default error message")
         mock_locale_module.locale = {
-            "array_of": lambda args: "Schema must be a type of Schema, got %r" % args[0],
             "type": lambda args: "Value is not of type %r, got %r" % args,
             "array": "invalid array",
             "min": lambda args: "Min length must be %r" % args[0],
@@ -51,11 +50,8 @@ def test_array_schema_of_success_with_number_schema():
 
 def test_array_schema_of_invalid_schema_type():
     schema = ArraySchema()
-    with pytest.raises(ValidationError) as excinfo:
+    with pytest.raises(TypeError):
         schema.of("not a schema object")
-    assert excinfo.value.constraint.type == "array_of"
-    assert excinfo.value.invalid_value == "not a schema object"
-    assert excinfo.value.constraint.format_message == "Schema must be a type of ISchema or ISchemaAdapter, got <class 'str'>"
 
 
 def test_array_schema_validate_success_no_of():

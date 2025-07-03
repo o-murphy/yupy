@@ -1,6 +1,4 @@
-from yupy import string, number, array, mapping
-from yupy.adapters import required
-from yupy.validation_error import ValidationError
+from yupy import string, number, array, mapping, required, ValidationError
 
 if __name__ == "__main__":
 

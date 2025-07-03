@@ -14,6 +14,8 @@ __all__ = ('NumberSchema',)
 _T = TypeVar('_T')
 _NumberType: TypeAlias = Union[int, float]
 
+RoundingMethod = Literal['ceil', 'floor', 'round', 'trunc']
+
 
 @dataclass
 class NumberSchema(ComparableSchema, EqualityComparableSchema):
@@ -93,7 +95,7 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
         self._transforms.append(math.trunc)
         return self
 
-    def round(self, method: Literal['ceil', 'floor', 'round', 'trunc'] = 'round') -> Self:
+    def round(self, method: RoundingMethod = 'round') -> Self:
         """
         Adds a transformation to round the number based on the specified method.
 
@@ -109,7 +111,7 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
             Self: The schema instance, allowing for method chaining.
 
         Raises:
-            ValidationError: If an unsupported rounding method is provided.
+            ValueError: If an unsupported rounding method is provided.
         """
         valid_methods = ['ceil', 'floor', 'round', 'trunc']  # Define valid methods for the error message
 
@@ -124,11 +126,7 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
             case 'trunc':
                 self._transforms.append(math.trunc)
             case _:  # Default case for unsupported methods
-                raise ValidationError(
-                    Constraint("one_of", locale["one_of"], valid_methods),
-                    path="~",  # Path for errors originating from schema method arguments
-                    invalid_value=method
-                )
+                raise ValueError("round method should be one of %s" % valid_methods)
 
         return self
 

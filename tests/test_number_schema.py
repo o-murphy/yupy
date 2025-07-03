@@ -287,16 +287,8 @@ def test_round_trunc_success():
 def test_round_invalid_method_failure():
     """Test round() method with an invalid method string."""
     schema = NumberSchema()
-    with pytest.raises(ValidationError) as excinfo:
+    with pytest.raises(ValueError):
         schema.round(method='invalid_method')
-
-    assert excinfo.value.constraint.type == "one_of"
-    assert excinfo.value.path == "~"  # Path should be '~' as the error is from schema definition
-    assert excinfo.value.invalid_value == "invalid_method"
-
-    expected_message = locale["one_of"](
-        (['ceil', 'floor', 'round', 'trunc'],))  # Should match the tuple of valid methods
-    assert excinfo.value.constraint.format_message == expected_message
 
 
 def test_round_and_validate_chaining():

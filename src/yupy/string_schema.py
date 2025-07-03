@@ -1,7 +1,6 @@
 import re
 from dataclasses import field, dataclass
-from datetime import datetime, date
-from typing import Optional, Literal
+from datetime import date
 
 from typing_extensions import Self
 
@@ -259,6 +258,7 @@ class StringSchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
         Returns:
             Self: The schema instance, allowing for method chaining.
         """
+
         def _(x: str) -> str:
             return x.strip()
 

@@ -41,20 +41,13 @@ def test_mapping_schema_shape_success():
 
 def test_mapping_schema_shape_invalid_input():
     schema = MappingSchema()
-    with pytest.raises(ValidationError) as excinfo:
+    with pytest.raises(TypeError):
         schema.shape("not a dict")
-    assert excinfo.value.constraint.type == "shape"
-    assert excinfo.value.constraint.format_message == "'Shape' must be a type of 'Shape'"
-
 
 def test_mapping_schema_shape_invalid_field_type():
     schema = MappingSchema()
-    with pytest.raises(ValidationError) as excinfo:
+    with pytest.raises(TypeError):
         schema.shape({"name": "not a schema"})
-    assert excinfo.value.constraint.type == "shape_fields"
-    assert excinfo.value.path == "name"
-    assert excinfo.value.invalid_value == "not a schema"
-    assert "All shape items must have a values of type of" in excinfo.value.constraint.format_message
 
 
 # region Strict tests

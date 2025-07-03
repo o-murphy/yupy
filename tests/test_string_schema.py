@@ -1,6 +1,6 @@
 # test_string_schema.py
 import re
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import pytest
 
@@ -177,7 +177,7 @@ def test_trim_success():
     assert schema.validate("\tworld\n") == "world"
     assert schema.validate(" no leading spaces") == "no leading spaces"
     assert schema.validate("no trailing spaces ") == "no trailing spaces"
-    assert schema.validate("   ") == "" # All whitespace should become empty string
+    assert schema.validate("   ") == ""  # All whitespace should become empty string
 
 
 def test_trim_no_change():
@@ -271,6 +271,7 @@ def test_max_length_failure():
         schema.validate("abcdef")
     assert excinfo.value.constraint.type == "max"
     assert excinfo.value.invalid_value == "abcdef"
+
 
 # region Datetime and Date tests
 # def test_datetime_success_basic():
@@ -378,12 +379,12 @@ def test_date_failure_invalid_format():
     """Test date() fails for invalid ISO 8601 date formats."""
     schema = StringSchema().date()
     with pytest.raises(ValidationError) as excinfo:
-        schema.validate("2023/01/15") # Invalid separator
+        schema.validate("2023/01/15")  # Invalid separator
     assert excinfo.value.constraint.type == "date"
     assert excinfo.value.invalid_value == "2023/01/15"
 
     with pytest.raises(ValidationError) as excinfo:
-        schema.validate("2023-01-15T10:00:00") # Datetime instead of date
+        schema.validate("2023-01-15T10:00:00")  # Datetime instead of date
     assert excinfo.value.constraint.type == "date"
     assert excinfo.value.invalid_value == "2023-01-15T10:00:00"
 
