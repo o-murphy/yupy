@@ -7,6 +7,37 @@ YuPy is a schema builder for runtime value parsing and validation. Define a sche
 
 ---
 
+## 📋 Table of Contents
+
+- [Features](#-features)
+- [Installation](#-installation)
+- [Usage](#-usage)
+  - [Basic validation](#basic-validation)
+  - [Nullability](#nullability)
+  - [Arrays](#arrays)
+  - [Dictionaries (Mappings)](#dictionaries-mappings)
+  - [Union](#union)
+- [Adapters](#-adapters)
+  - [required](#required)
+  - [default](#default)
+  - [immutable](#immutable)
+- [API Reference](#-api-reference)
+  - [Base Schema](#base-schema)
+  - [Sized Schema](#sized-schema)
+  - [Comparable Schema](#comparable-schema)
+  - [String Schema](#string-schema)
+  - [Number Schema](#number-schema)
+  - [Array Schema](#array-schema)
+  - [Mapping Schema](#mapping-schema)
+  - [Mixed Schema](#mixed-schema)
+  - [Union Schema](#union-schema)
+- [Extending](#-extending)
+- [Running Tests](#-running-tests)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
 ## 🔧 Features
 
 - ✅ Schema-based validation: strings, numbers, arrays, dictionaries
@@ -107,79 +138,118 @@ immutable(string()).validate("data")  # -> creates deep copy
 
 ## 📘 API Reference
 
-### Base
+### Base Schema
 
-```python
-nullable(self) -> Self
-not_nullable(self, message: ErrorMessage) -> Self
-test(self, func: ValidatorFunc) -> Self
-const(self, value: Optional[_SchemaExpectedType], message: ErrorMessage) -> Self
-transform(self, func: TransformFunc) -> Self
-```
+**Inheritance:** `Schema` (implements `ISchema`)
 
-### Sized
+Base class for all schema types providing core validation functionality.
 
-```python
-length(self, limit: int, message: ErrorMessage) -> Self
-min(self, limit: int, message: ErrorMessage) -> Self
-max(self, limit: int, message: ErrorMessage) -> Self
-```
+| Method | Description |
+|--------|-------------|
+| `nullable() -> Self` | Makes the schema accept `None` values |
+| `not_nullable(message: ErrorMessage = None) -> Self` | Explicitly disallows `None` values with custom message |
+| `test(func: ValidatorFunc) -> Self` | Adds a custom validation function |
+| `const(value: Any, message: ErrorMessage = None) -> Self` | Validates that the value equals a constant |
+| `transform(func: TransformFunc) -> Self` | Adds a transformation function |
+| `validate(value: Any, abort_early: bool = True, path: str = "~") -> Any` | Validates the value against the schema |
 
-### Comparable
+### Sized Schema
 
-```python
-le(self, limit: Any, message: ErrorMessage) -> Self
-ge(self, limit: Any, message: ErrorMessage) -> Self
-lt(self, limit: Any, message: ErrorMessage) -> Self
-gt(self, limit: Any, message: ErrorMessage) -> Self
-```
+**Inheritance:** `Schema` → `SizedSchema` (implements `ISizedSchema`)
 
-### StringSchema
+Provides size-based validation methods for sequences and collections.
 
-```python
-email(self, message: ErrorMessage) -> Self
-url(self, message: ErrorMessage) -> Self
-uuid(self, message: ErrorMessage) -> Self
-matches(self, regex: re.Pattern, message: ErrorMessage, exclude_empty: bool = False) -> Self
-lowercase(self, message: ErrorMessage) -> Self
-uppercase(self, message: ErrorMessage) -> Self
-ensure(self) -> Self
-```
+| Method | Description |
+|--------|-------------|
+| `length(limit: int, message: ErrorMessage = None) -> Self` | Validates exact length |
+| `min(limit: int, message: ErrorMessage = None) -> Self` | Validates minimum length |
+| `max(limit: int, message: ErrorMessage = None) -> Self` | Validates maximum length |
 
-### NumberSchema
+### Comparable Schema
 
-```python
-positive(self, message: ErrorMessage) -> Self
-negative(self, message: ErrorMessage) -> Self
-integer(self, message: ErrorMessage) -> Self
-multiple_of(self, multiplier: Union[int, float], message: ErrorMessage) -> Self
-```
+**Inheritance:** `Schema` → `ComparableSchema` (implements `IComparableSchema`)
 
-### ArraySchema
+Provides comparison-based validation methods.
 
-```python
-of(self, schema: Union[ISchema, ISchemaAdapter], message: ErrorMessage) -> Self
-```
+| Method | Description |
+|--------|-------------|
+| `le(limit: Any, message: ErrorMessage = None) -> Self` | Validates value ≤ limit |
+| `ge(limit: Any, message: ErrorMessage = None) -> Self` | Validates value ≥ limit |
+| `lt(limit: Any, message: ErrorMessage = None) -> Self` | Validates value < limit |
+| `gt(limit: Any, message: ErrorMessage = None) -> Self` | Validates value > limit |
+| `eq(value: Any, message: ErrorMessage = None) -> Self` | Validates value equals specified value |
+| `ne(value: Any, message: ErrorMessage = None) -> Self` | Validates value not equals specified value |
 
-### MappingSchema
+### String Schema
 
-```python
-shape(self, fields: _SchemaShape) -> Self
-strict(self, is_strict: bool = True, message: ErrorMessage) -> Self
-```
+**Inheritance:** `Schema` → `SizedSchema`, `ComparableSchema`, `EqualityComparableSchema` → `StringSchema`
 
-### MixedSchema
+Validates string values with text-specific methods.
 
-```python
-of(self, type_or_types: _SchemaExpectedType, message: ErrorMessage) -> Self
-one_of(self, items: Iterable, message: ErrorMessage) -> Self
-```
+| Method | Description |
+|--------|-------------|
+| `email(message: ErrorMessage = None) -> Self` | Validates email format |
+| `url(message: ErrorMessage = None) -> Self` | Validates URL format |
+| `uuid(message: ErrorMessage = None) -> Self` | Validates UUID format |
+| `matches(regex: re.Pattern, message: ErrorMessage = None, exclude_empty: bool = False) -> Self` | Validates against regex pattern |
+| `lowercase(message: ErrorMessage = None) -> Self` | Validates string is lowercase |
+| `uppercase(message: ErrorMessage = None) -> Self` | Validates string is uppercase |
+| `ensure() -> Self` | Transforms empty/null values to empty string |
 
-### UnionSchema
+### Number Schema
 
-```python
-one_of(self, options: UnionOptionsType, message: ErrorMessage) -> Self
-```
+**Inheritance:** `Schema` → `ComparableSchema`, `EqualityComparableSchema` → `NumberSchema`
+
+Validates numeric values (int, float) with number-specific methods.
+
+| Method | Description |
+|--------|-------------|
+| `positive(message: ErrorMessage = None) -> Self` | Validates number > 0 |
+| `negative(message: ErrorMessage = None) -> Self` | Validates number < 0 |
+| `integer(message: ErrorMessage = None) -> Self` | Validates number is integer (no decimals) |
+| `multiple_of(multiplier: Union[int, float], message: ErrorMessage = None) -> Self` | Validates number is multiple of specified value |
+
+### Array Schema
+
+**Inheritance:** `Schema` → `SizedSchema`, `ComparableSchema`, `EqualityComparableSchema` → `ArraySchema`
+
+Validates list and tuple values.
+
+| Method | Description |
+|--------|-------------|
+| `of(schema: Union[ISchema, ISchemaAdapter], message: ErrorMessage = None) -> Self` | Validates all array elements against schema |
+
+### Mapping Schema
+
+**Inheritance:** `Schema` → `EqualityComparableSchema` → `MappingSchema`
+
+Validates dictionary/mapping values with object shape validation.
+
+| Method | Description |
+|--------|-------------|
+| `shape(fields: Dict[str, Union[ISchema, ISchemaAdapter]]) -> Self` | Defines the expected shape/structure |
+| `strict(is_strict: bool = True, message: ErrorMessage = None) -> Self` | Disallows unknown keys when True |
+
+### Mixed Schema
+
+**Inheritance:** `Schema` → `EqualityComparableSchema` → `MixedSchema`
+
+Validates values of any type with flexible type checking.
+
+| Method | Description |
+|--------|-------------|
+| `of(type_or_types: _SchemaExpectedType, message: ErrorMessage = None) -> Self` | Validates value is of specified type(s) |
+| `one_of(items: Iterable, message: ErrorMessage = None) -> Self` | Validates value is one of the specified items |
+
+### Union Schema
+
+**Inheritance:** `Schema` → `EqualityComparableSchema` → `UnionSchema`
+
+Validates values that can match one of multiple schemas.
+
+| Method | Description |
+|--------|-------------|
+| `one_of(options: List[Union[ISchema, ISchemaAdapter]], message: ErrorMessage = None) -> Self` | Validates value matches at least one of the provided schemas |
 
 ---
 
@@ -197,12 +267,29 @@ def is_palindrome(value):
 string().test(is_palindrome).validate("madam")
 ```
 
+### Custom Adapter
+
+```python
+from yupy import SchemaAdapter, string
+
+class CustomAdapter(SchemaAdapter):
+    def validate(self, value, abort_early=True, path="~"):
+        # Custom logic before validation
+        result = super().validate(value, abort_early, path)
+        # Custom logic after validation
+        return result
+
+# Usage
+custom = CustomAdapter(string().min(3))
+custom.validate("hello")
+```
+
 ---
 
 ## ✅ Running Tests
 
 ```bash
-pytest
+pytest ./tests
 ```
 
 ---
@@ -211,9 +298,15 @@ pytest
 
 Contributions are welcome! Please open issues or submit pull requests.
 
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
 ---
 
 ## 📄 License
 
 MIT License  
-Copyright (c)
+Copyright (c) YuPy Contributors
