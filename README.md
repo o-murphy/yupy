@@ -2,6 +2,60 @@
 
 ## Dead simple object schema validation for Python
 
+[![license]][LGPL-3]
+[![pypi]][PyPiUrl]
+[![pypi-pre]][pypi-pre-url]
+[![downloads]][pepy]
+[![downloads/month]][pepy]
+[![coverage]][coverage]
+[![py-versions]][sources]
+[![Test](https://github.com/o-murphy/yupy/actions/workflows/pytest.yml/badge.svg)](https://github.com/o-murphy/yupy/actions/workflows/pytest.yml)
+[![Ruff](https://github.com/o-murphy/yupy/actions/workflows/mypy.yml/badge.svg)](https://github.com/o-murphy/yupy/actions/workflows/mypy.yml)
+[![Mypy](https://github.com/o-murphy/yupy/actions/workflows/ruff.yml/badge.svg)](https://github.com/o-murphy/yupy/actions/workflows/ruff.yml)
+[![Made in Ukraine]][SWUBadge]
+
+[sources]:
+https://github.com/o-murphy/yupy
+
+[license]:
+https://img.shields.io/github/license/o-murphy/yupy
+
+[LGPL-3]:
+https://opensource.org/licenses/MIT
+
+[pypi]:
+https://img.shields.io/pypi/v/yupy?logo=pypi
+
+[PyPiUrl]:
+https://pypi.org/project/yupy/
+
+[pypi-pre]:
+https://img.shields.io/github/v/release/o-murphy/yupy?include_prereleases&logo=pypi&label=pypi%20pre
+
+[pypi-pre-url]:
+https://pypi.org/project/yupy/#history
+
+[downloads]:
+https://img.shields.io/pepy/dt/yupy
+
+[downloads/month]:
+https://static.pepy.tech/personalized-badge/yupy?period=month&units=abbreviation&left_color=grey&right_color=blue&left_text=downloads%2Fmonth
+
+[pepy]:
+https://pepy.tech/project/yupy
+
+[py-versions]:
+https://img.shields.io/pypi/pyversions/yupy?style=flat-square
+
+[coverage]:
+./coverage.svg
+
+[Made in Ukraine]:
+https://img.shields.io/badge/made_in-Ukraine-ffd700.svg?labelColor=0057b7&style=flat-square
+
+[SWUBadge]:
+https://stand-with-ukraine.pp.ua
+
 *Inspired by [**yup js library**](https://github.com/jquense/yup)*
 
 YuPy is a schema builder for runtime value parsing and validation. Define a schema, transform a value to match, assert
