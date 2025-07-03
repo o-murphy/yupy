@@ -5,7 +5,7 @@ from yupy.validation_error import ValidationError, Constraint, _EMPTY_MESSAGE_
 
 
 def test_constraint_init_with_type_and_message():
-    constraint = Constraint(type="test_type", message="Test message")
+    constraint = Constraint("test_type", "Test message")
     assert constraint.type == "test_type"
     assert constraint.args == ()
     assert constraint.message == "Test message"
@@ -16,7 +16,7 @@ def test_constraint_init_with_type_and_no_message():
     # i.e., within the yupy.validation_error module's namespace, as it's imported at the top.
     with patch('yupy.validation_error.get_error_message',
                return_value="Default error message") as mock_get_error_message:
-        constraint = Constraint(type="test_type")
+        constraint = Constraint("test_type")
         assert constraint.type == "test_type"
         assert constraint.args == ()
         assert constraint.message == "Default error message"
@@ -117,17 +117,17 @@ def test_validation_error_errors_property_nested_errors():
 
 
 def test_validation_error_message_property():
-    constraint = Constraint("max_length", message="Too long")
+    constraint = Constraint("max_length", "Too long")
     error = ValidationError(constraint=constraint, path="description")
     assert error.message == "'description':Too long"
 
 
 def test_validation_error_messages_property():
-    c1 = Constraint("c1", message="m1")
+    c1 = Constraint("c1", "m1")
     e1 = ValidationError(c1, "p1")
-    c2 = Constraint("c2", message="m2")
+    c2 = Constraint("c2", "m2")
     e2 = ValidationError(c2, "p2")
-    c3 = Constraint("c3", message="m3")
+    c3 = Constraint("c3", "m3")
     e3 = ValidationError(c3, "p3", errors=[e1, e2])
 
     messages = list(e3.messages)
