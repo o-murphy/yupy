@@ -40,7 +40,7 @@ jobs:
         # This step will only run if the workflow was triggered by a manual dispatch
         # or a push event (if you add 'push' to the 'on' block).
         # It avoids running on pull_request events to prevent infinite loops and permission issues with forks.
-        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+        # if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: |
           # Configure Git user details for the commit
           git config user.name "github-actions[bot]"
