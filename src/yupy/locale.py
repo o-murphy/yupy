@@ -56,6 +56,7 @@ class Locale(TypedDict, total=False):
     mapping: ErrorMessage
     strict: ErrorMessage
     one_of: ErrorMessage
+    json: ErrorMessage
     undefined: ErrorMessage
 
 
@@ -64,7 +65,7 @@ LocaleKey = Literal[
     "email", "url", "uuid", "lowercase", "uppercase",
     "le", "ge", "lt", "gt", "eq", "ne",
     "integer", "multiple_of", "positive", "negative", "date", "datetime",
-    "array", "mapping", "strict", "one_of", "undefined"
+    "array", "mapping", "strict", "one_of", "json", "undefined"
 ]
 """
 Literal type defining all valid keys for the `locale` dictionary.
@@ -102,6 +103,7 @@ locale: Locale = {
     "multiple_of": lambda args: "Value must be a multiple of %r" % args,
     "strict": lambda args: "Object contains unknown keys: %s" % (", ".join(map(repr, args)),),
     "one_of": lambda args: "Must be one of %r" % args,
+    "json": lambda args: "Value must be a valid JSON",
     "undefined": "Undefined validation error"
 }
 """

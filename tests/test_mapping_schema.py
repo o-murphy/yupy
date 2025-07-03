@@ -44,6 +44,7 @@ def test_mapping_schema_shape_invalid_input():
     with pytest.raises(TypeError):
         schema.shape("not a dict")
 
+
 def test_mapping_schema_shape_invalid_field_type():
     schema = MappingSchema()
     with pytest.raises(TypeError):

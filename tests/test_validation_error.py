@@ -78,14 +78,19 @@ def test_validation_error_str_representation():
     constraint = Constraint("invalid_format", "Incorrect format")
     error = ValidationError(constraint=constraint, path="user.email")
     assert str(
-        error) == "(path='user.email', constraint=Constraint(type='invalid_format', args=()), message='Incorrect format')"
+        error) == ("(path='user.email', "
+                   "constraint=Constraint(type='invalid_format', args=(), origin=None), "
+                   "message='Incorrect format')")
 
 
 def test_validation_error_repr_representation():
     constraint = Constraint("null_value", "Cannot be null")
     error = ValidationError(constraint=constraint, path="item.id")
+    print(repr(error))
     assert repr(
-        error) == "ValidationError(path='item.id', constraint=Constraint(type='null_value', args=()), message='Cannot be null')"
+        error) == ("ValidationError(path='item.id', "
+                   "constraint=Constraint(type='null_value', args=(), origin=None), "
+                   "message='Cannot be null')")
 
 
 def test_validation_error_errors_property_single_error():

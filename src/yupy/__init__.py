@@ -22,6 +22,7 @@ union = UnionSchema
 immutable = SchemaImmutableAdapter
 default = SchemaDefaultAdapter
 required = SchemaRequiredAdapter
+json = SchemaJsonAdapter
 
 __all__ = (
     'ErrorMessage',
@@ -47,6 +48,7 @@ __all__ = (
 
     'ISchemaAdapter',
     'SchemaAdapter',
+    'SchemaJsonAdapter',
     'SchemaDefaultAdapter',
     'SchemaRequiredAdapter',
     'SchemaImmutableAdapter',
@@ -62,6 +64,7 @@ __all__ = (
     'immutable',
     'required',
     'default',
+    'json',
 
     'locale',
     'set_locale',

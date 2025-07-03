@@ -31,15 +31,18 @@ class Constraint:
             the error message (e.g., the expected type, the limit for length).
         message (ErrorMessage): The raw error message template or string.
             This field is excluded from `repr()` to avoid verbosity.
+        origin: Optional[Exception]: wrapped exception.
     """
-    type: str
+    type: Optional[str]
     args: Any
     message: ErrorMessage = field(repr=False)
+    origin: Optional[Exception]
 
     def __init__(self,
-                 type_: Optional[str],
+                 type_: Optional[str] = "unknown",
                  message: Optional[ErrorMessage] = _EMPTY_MESSAGE_,
                  *args: Any,
+                 origin: Optional[Exception] = None,
                  ):
         """
         Initializes a new Constraint instance.
@@ -55,6 +58,7 @@ class Constraint:
         """
         self.type = type_ or "undefined"
         self.args = args
+        self.origin = origin
         if message is None or message is _EMPTY_MESSAGE_:  # Check against _EMPTY_MESSAGE_ for default behavior
             self.message = get_error_message("undefined")
         else:
