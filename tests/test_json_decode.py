@@ -1,10 +1,12 @@
+import json
+import warnings
+from json import JSONDecodeError
 from typing import Union, Any, Optional
+from unittest.mock import patch
 
 import pytest
-import warnings
-import json
-from json import JSONDecodeError
-from unittest.mock import patch
+
+from yupy._json_decode import get_json_parser, loads
 
 orjson: Optional[Any]
 
@@ -13,13 +15,15 @@ try:
 except ImportError:
     orjson = None
 
+
 # Import the functions directly from your _json_decode.py file
 # Assuming _json_decode.py is accessible in the test environment
-from yupy._json_decode import get_json_parser, loads
+
 
 # Define a mock orjson for testing when it's supposed to be installed
 class MockOrjson:
     """A mock object to simulate orjson module behavior."""
+
     def loads(self, fp: Union[bytes, str], **kwargs: Any) -> Any:
         # Simulate orjson's loads behavior, which typically doesn't take many kwargs
         # and is strict about what it receives.
@@ -28,14 +32,16 @@ class MockOrjson:
             # For this mock, we'll just acknowledge them if they were filtered.
             pass
         if isinstance(fp, (bytes, bytearray, memoryview)):
-            return json.loads(fp.decode('utf-8')) # Decode bytes for standard json parsing
+            return json.loads(fp.decode('utf-8'))  # Decode bytes for standard json parsing
         return json.loads(fp)
 
     # Add OPT_* attributes if needed for more advanced orjson testing, e.g.:
     # OPT_INDENT_2 = 1 # Example option for dumps, not loads
 
+
 if orjson is None:
     orjson = MockOrjson()
+
 
 class TestGetJsonParser:
     """
@@ -48,7 +54,7 @@ class TestGetJsonParser:
         Tests that get_json_parser returns orjson when it's installed.
         """
         parser = get_json_parser("orjson")
-        assert isinstance(parser, MockOrjson) # Check if it's our mock orjson
+        assert isinstance(parser, MockOrjson)  # Check if it's our mock orjson
 
     @patch('yupy._json_decode.orjson', new=None)
     def test_get_json_parser_orjson_not_available_falls_back_to_json(self):
@@ -56,7 +62,7 @@ class TestGetJsonParser:
         Tests that get_json_parser falls back to json and warns when orjson is not installed.
         """
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always") # Ensure all warnings are caught
+            warnings.simplefilter("always")  # Ensure all warnings are caught
             parser = get_json_parser("orjson")
             assert parser is json
             assert len(w) == 1
@@ -74,8 +80,9 @@ class TestGetJsonParser:
         """
         Tests that get_json_parser raises ValueError for unsupported parser types.
         """
-        with pytest.raises(ValueError, match="Unsupported parser specified: 'unsupported'. Must be 'json' or 'orjson'."):
-            get_json_parser("unsupported") # type: ignore
+        with pytest.raises(ValueError,
+                           match="Unsupported parser specified: 'unsupported'. Must be 'json' or 'orjson'."):
+            get_json_parser("unsupported")  # type: ignore
 
 
 class TestLoadsFunction:
@@ -116,6 +123,7 @@ class TestLoadsFunction:
         """
         Tests loads with "json" parser and keyword arguments (e.g., object_hook).
         """
+
         def custom_hook(obj):
             if "value" in obj:
                 obj["value_plus_one"] = obj["value"] + 1
@@ -124,7 +132,7 @@ class TestLoadsFunction:
         result = loads(self.json_data_str, "json", object_hook=custom_hook)
         assert result == {"name": "Test", "value": 123, "is_active": True, "value_plus_one": 124}
 
-    @patch('yupy._json_decode.orjson', new=MockOrjson()) # Ensure orjson is mocked for this test
+    @patch('yupy._json_decode.orjson', new=MockOrjson())  # Ensure orjson is mocked for this test
     def test_loads_orjson_with_unsupported_kwargs_warns(self):
         """
         Tests that loads with "orjson" parser warns about unsupported kwargs.
@@ -138,8 +146,8 @@ class TestLoadsFunction:
             assert issubclass(w[-1].category, UserWarning)
             assert "Unsupported arguments passed to orjson.loads: cls." in str(w[-1].message)
 
-    @patch('yupy._json_decode.orjson', new=None) # Ensure orjson is not available
-    @patch('yupy._json_decode.warnings.warn') # Patch the warning for get_json_parser
+    @patch('yupy._json_decode.orjson', new=None)  # Ensure orjson is not available
+    @patch('yupy._json_decode.warnings.warn')  # Patch the warning for get_json_parser
     def test_loads_orjson_not_installed_fallback(self, mock_warn):
         """
         Tests that loads falls back to json if orjson is specified but not installed.
@@ -156,7 +164,7 @@ class TestLoadsFunction:
         """
         Tests that loads raises JSONDecodeError for invalid JSON strings.
         """
-        invalid_json = '{"key": "value' # Malformed JSON
+        invalid_json = '{"key": "value'  # Malformed JSON
         with pytest.raises(JSONDecodeError):
             loads(invalid_json, "json")
 
@@ -186,4 +194,3 @@ class TestLoadsFunction:
         if orjson:
             with pytest.raises(JSONDecodeError):
                 loads(b"", "orjson")
-

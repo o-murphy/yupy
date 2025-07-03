@@ -13,6 +13,7 @@ except ImportError:
 __all__ = (
     'SUPPORTED_JSON_PARSER',
     'loads',
+    'get_json_parser',
 )
 
 # Define a TypeVar for the parser type (e.g., "json" or "orjson")
