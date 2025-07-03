@@ -38,6 +38,11 @@ dynamic = ["version"]
 "Bug Reports" = "https://github.com/o-murphy/yup/issues"
 "Source" = "https://github.com/o-murphy/yup"
 
+[project.optional-dependencies]
+orjson = [
+    "orjson>=3.10.18",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["yupy*"]
@@ -58,6 +63,7 @@ extend-exclude = ["__init__.py"]
 dev = [
     "coverage-badge>=1.1.2",
     "mypy>=1.15.0",
+    "orjson>=3.10.18",
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
     "ruff>=0.12.1",
