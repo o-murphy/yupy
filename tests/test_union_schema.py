@@ -14,21 +14,8 @@ from yupy.validation_error import ValidationError
 @pytest.fixture(autouse=True)
 def mock_yupy_locale():
     # Create a mock for the 'locale' dictionary itself
-    mock_locale_data = {
-        # Copy actual lambdas/strings from yupy.locale.locale where appropriate
-        "type": yupy_actual_locale["type"],
-        "not_nullable": yupy_actual_locale["not_nullable"],
-        "undefined": yupy_actual_locale["undefined"],
-        "min": yupy_actual_locale["min"],
-        "max": yupy_actual_locale["max"],
-        "length": yupy_actual_locale["length"],
-        "gt": yupy_actual_locale["gt"],
-        "ge": yupy_actual_locale["ge"],
-        "array_of": yupy_actual_locale["array_of"],
-        "array": yupy_actual_locale["array"],
-        "one_of": yupy_actual_locale["one_of"],
-        "nullable": yupy_actual_locale["nullable"],
-    }
+    mock_locale_data = yupy_actual_locale.copy()
+
     # Patch the yupy.locale module itself, and set its attributes
     with patch('yupy.locale', new=MagicMock(locale=mock_locale_data, get_error_message=yupy_actual_get_error_message)):
         yield

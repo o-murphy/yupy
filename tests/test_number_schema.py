@@ -230,3 +230,110 @@ def test_number_schema_nullable_behavior():
     with pytest.raises(ValidationError) as excinfo:
         schema_integer_not_nullable.validate(None)
     assert excinfo.value.constraint.type == "nullable"
+
+
+# region Rounding and Truncation tests
+def test_truncate_success():
+    """Test truncate() method for successful transformation."""
+    schema = NumberSchema().truncate()
+    assert schema.validate(5.7) == 5
+    assert schema.validate(-5.7) == -5
+    assert schema.validate(5) == 5
+    assert schema.validate(-5) == -5
+    assert schema.validate(0.999) == 0
+    assert schema.validate(-0.999) == 0
+
+
+def test_round_default_success():
+    """Test round() method with default 'round' behavior."""
+    schema = NumberSchema().round()
+    assert schema.validate(5.7) == 6
+    assert schema.validate(5.3) == 5
+    assert schema.validate(-5.7) == -6
+    assert schema.validate(-5.3) == -5
+    assert schema.validate(2.5) == 2  # Standard round ties to nearest even
+    assert schema.validate(3.5) == 4  # Standard round ties to nearest even
+
+
+def test_round_ceil_success():
+    """Test round() method with 'ceil' behavior."""
+    schema = NumberSchema().round(method='ceil')
+    assert schema.validate(5.1) == 6
+    assert schema.validate(5.0) == 5
+    assert schema.validate(-5.1) == -5  # ceil(-5.1) is -5
+    assert schema.validate(-5.0) == -5
+
+
+def test_round_floor_success():
+    """Test round() method with 'floor' behavior."""
+    schema = NumberSchema().round(method='floor')
+    assert schema.validate(5.9) == 5
+    assert schema.validate(5.0) == 5
+    assert schema.validate(-5.9) == -6  # floor(-5.9) is -6
+    assert schema.validate(-5.0) == -5
+
+
+def test_round_trunc_success():
+    """Test round() method with 'trunc' behavior."""
+    schema = NumberSchema().round(method='trunc')
+    assert schema.validate(5.7) == 5
+    assert schema.validate(-5.7) == -5
+    assert schema.validate(5.0) == 5
+    assert schema.validate(-5.0) == -5
+    assert schema.validate(0.999) == 0
+    assert schema.validate(-0.999) == 0
+
+
+def test_round_invalid_method_failure():
+    """Test round() method with an invalid method string."""
+    schema = NumberSchema()
+    with pytest.raises(ValidationError) as excinfo:
+        schema.round(method='invalid_method')
+
+    assert excinfo.value.constraint.type == "one_of"
+    assert excinfo.value.path == "~"  # Path should be '~' as the error is from schema definition
+    assert excinfo.value.invalid_value == "invalid_method"
+
+    expected_message = locale["one_of"](
+        (['ceil', 'floor', 'round', 'trunc'],))  # Should match the tuple of valid methods
+    assert excinfo.value.constraint.format_message == expected_message
+
+
+def test_round_and_validate_chaining():
+    """Test chaining round() with other validation methods."""
+    schema = NumberSchema().round('ceil').positive().integer()
+    assert schema.validate(5.1) == 6  # ceil(5.1) -> 6, positive, integer
+    assert schema.validate(0.1) == 1  # ceil(0.1) -> 1, positive, integer
+
+    # This test case is expected to raise a ValidationError
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(-0.1)  # ceil(-0.1) -> 0, fails positive()
+    assert excinfo.value.constraint.type == "gt"
+    assert excinfo.value.invalid_value == -0.1  # The invalid_value should be the original input to validate()
+
+    # Test an actual failure case for chaining:
+    schema_chained_negative_fail = NumberSchema().round('floor').positive()
+    with pytest.raises(ValidationError) as excinfo:
+        schema_chained_negative_fail.validate(-0.9)  # floor(-0.9) is -1, fails positive()
+    assert excinfo.value.constraint.type == "gt"
+    assert excinfo.value.invalid_value == -0.9  # The invalid_value should be the original input to validate()
+
+
+def test_truncate_and_validate_chaining():
+    """Test chaining truncate() with other validation methods."""
+    schema = NumberSchema().truncate().positive().integer()
+    assert schema.validate(5.7) == 5  # trunc(5.7) -> 5, positive, integer
+
+    # This test case is expected to raise a ValidationError
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(0.1)  # trunc(0.1) -> 0, fails positive()
+    assert excinfo.value.constraint.type == "gt"
+    assert excinfo.value.invalid_value == 0.1  # The invalid_value should be the original input to validate()
+
+    # This test case is expected to raise a ValidationError
+    with pytest.raises(ValidationError) as excinfo:
+        schema.validate(-5.7)  # trunc(-5.7) -> -5, fails positive()
+    assert excinfo.value.constraint.type == "gt"
+    assert excinfo.value.invalid_value == -5.7  # The invalid_value should be the original input to validate()
+
+# endregion

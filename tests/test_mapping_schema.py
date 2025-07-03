@@ -14,25 +14,7 @@ from yupy.validation_error import ValidationError
 # Patch the locale module for tests that don't explicitly set messages
 @pytest.fixture(autouse=True)
 def mock_yupy_locale():
-    mock_locale_data = {
-        "type": yupy_actual_locale["type"],
-        "not_nullable": yupy_actual_locale["not_nullable"],
-        "undefined": yupy_actual_locale["undefined"],
-        "min": yupy_actual_locale["min"],
-        "max": yupy_actual_locale["max"],
-        "length": yupy_actual_locale["length"],
-        "gt": yupy_actual_locale["gt"],
-        "ge": yupy_actual_locale["ge"],
-        "array_of": yupy_actual_locale["array_of"],
-        "array": yupy_actual_locale["array"],
-        "one_of": yupy_actual_locale["one_of"],
-        "const": yupy_actual_locale["const"],
-        "required": "Value is required",  # New for MappingSchema tests
-        "mapping": yupy_actual_locale["mapping"],  # New for MappingSchema tests (Consistent with locale.py)
-        "shape": yupy_actual_locale["shape"],  # From locale.py
-        "shape_fields": yupy_actual_locale["shape_fields"],  # From locale.py
-        "strict": lambda args: f"Object contains unknown keys: {', '.join(map(repr, args[0]))}",  # Modified for repr
-    }
+    mock_locale_data = yupy_actual_locale.copy()
 
     # Patch the yupy.locale module itself, and set its attributes
     with patch('yupy.locale',

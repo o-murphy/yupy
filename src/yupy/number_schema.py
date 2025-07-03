@@ -1,5 +1,6 @@
+import math
 from dataclasses import dataclass, field
-from typing import Union, TypeAlias, TypeVar
+from typing import Union, TypeAlias, TypeVar, Literal
 
 from typing_extensions import Self
 
@@ -79,13 +80,57 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
 
         return self.test(_)
 
-    # TODO:
-    # def truncate(self):
-    #     ...
+    def truncate(self) -> Self:
+        """
+        Adds a transformation to truncate the number, removing its decimal part.
 
-    # TODO:
-    # def round(self, method: Literal['ceil', 'floor', 'round', 'trunc']) -> 'NumberSchema':
-    #     self._transforms
+        This operation effectively rounds the number towards zero.
+
+        Returns:
+            Self: The schema instance, allowing for method chaining.
+        """
+        # Directly append math.trunc as it matches the TransformFunc signature
+        self._transforms.append(math.trunc)
+        return self
+
+    def round(self, method: Literal['ceil', 'floor', 'round', 'trunc'] = 'round') -> Self:
+        """
+        Adds a transformation to round the number based on the specified method.
+
+        Args:
+            method (Literal['ceil', 'floor', 'round', 'trunc'], optional): The rounding method to use.
+                - 'ceil': Rounds up to the nearest integer.
+                - 'floor': Rounds down to the nearest integer.
+                - 'round': Rounds to the nearest integer (standard Python `round()`).
+                - 'trunc': Truncates the decimal part (rounds towards zero).
+                Defaults to 'round'.
+
+        Returns:
+            Self: The schema instance, allowing for method chaining.
+
+        Raises:
+            ValidationError: If an unsupported rounding method is provided.
+        """
+        valid_methods = ['ceil', 'floor', 'round', 'trunc']  # Define valid methods for the error message
+
+        # Use match statement to directly append the appropriate function
+        match method:
+            case 'round':
+                self._transforms.append(round)
+            case 'ceil':
+                self._transforms.append(math.ceil)
+            case 'floor':
+                self._transforms.append(math.floor)
+            case 'trunc':
+                self._transforms.append(math.trunc)
+            case _:  # Default case for unsupported methods
+                raise ValidationError(
+                    Constraint("one_of", locale["one_of"], valid_methods),
+                    path="~",  # Path for errors originating from schema method arguments
+                    invalid_value=method
+                )
+
+        return self
 
     def multiple_of(self, multiplier: Union[int, float],
                     message: ErrorMessage = locale["multiple_of"]) -> Self:

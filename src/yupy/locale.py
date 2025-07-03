@@ -50,6 +50,8 @@ class Locale(TypedDict, total=False):
     multiple_of: ErrorMessage
     positive: ErrorMessage
     negative: ErrorMessage
+    date: ErrorMessage
+    datetime: ErrorMessage
     array: ErrorMessage
     mapping: ErrorMessage
     array_of: ErrorMessage
@@ -64,7 +66,8 @@ LocaleKey = Literal[
     "const", "type", "min", "max", "length", "required", "nullable", "not_nullable", "test", "matches",
     "email", "url", "uuid", "lowercase", "uppercase",
     "le", "ge", "lt", "gt", "eq", "ne",
-    "integer", "multiple_of", "positive", "negative", "mapping", "array", "array_of", "shape",
+    "integer", "multiple_of", "positive", "negative", "date", "datetime",
+    "array", "mapping", "array_of", "shape",
     "shape_fields", "strict", "one_of", "undefined"
 ]
 """
@@ -96,6 +99,8 @@ locale: Locale = {
     "positive": "Value must be positive, a.g. > 0",
     "negative": "Value must be positive, a.g. < 0",
     "integer": "Value must be valid 'int', got 'float'",
+    "date": "Value must be a valid ISO 8601 date (YYYY-MM-DD)",
+    "datetime": "Value must be a valid ISO 8601 datetime",
     "array": "Invalid array",
     "mapping": "Invalid mapping",
     "array_of": lambda args: "Schema must be a type of ISchema or ISchemaAdapter, got %r" % args,

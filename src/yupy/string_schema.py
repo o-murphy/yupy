@@ -1,5 +1,7 @@
 import re
 from dataclasses import field, dataclass
+from datetime import datetime, date
+from typing import Optional, Literal
 
 from typing_extensions import Self
 
@@ -143,13 +145,92 @@ class StringSchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
 
         return self.test(_)
 
-    # TODO:
-    # def datetime(self, message: ErrorMessage, precision: int, allow_offset: bool = False):
-    #     def _(x: str):
-    #         if ...:
-    #             raise ValidationError(message)
-    #     self._validators.append(_)
-    #     return self
+    # # FIXME
+    # def datetime(self, message: ErrorMessage = locale["datetime"], precision: Optional[Literal[0, 3, 6]] = None,
+    #              allow_offset: bool = True) -> Self:
+    #     """
+    #     Adds a validation rule to ensure the string is a valid ISO 8601 datetime.
+    #
+    #     This method attempts to parse the string using `datetime.datetime.fromisoformat()`.
+    #     It also supports optional validation for fractional second precision and control over timezone offsets.
+    #
+    #     Args:
+    #         message (ErrorMessage): The error message to use if the validation fails.
+    #             Defaults to the locale-defined message for "datetime".
+    #         precision (Optional[Literal[0, 3, 6]]): If specified, validates the fractional
+    #             second precision of the datetime string.
+    #             - `0`: No fractional seconds (e.g., `YYYY-MM-DDTHH:MM:SS`).
+    #             - `3`: Milliseconds precision (e.g., `YYYY-MM-DDTHH:MM:SS.mmm`).
+    #             - `6`: Microseconds precision (e.g., `YYYY-MM-DDTHH:MM:SS.mmmmmm`).
+    #             If `None`, any valid precision is allowed.
+    #         allow_offset (bool): If `False`, disallows timezone offsets (e.g., `Z`, `+01:00`).
+    #             If `True`, allows them. Defaults to `True`.
+    #
+    #     Returns:
+    #         Self: The schema instance, allowing for method chaining.
+    #
+    #     Raises:
+    #         ValueError: If an invalid `precision` value (not 0, 3, 6, or None) is provided
+    #             during schema definition.
+    #     """
+    #     if precision is not None and precision not in [0, 3, 6]:
+    #         raise ValueError("Invalid precision value. Must be 0, 3, 6, or None.")
+    #
+    #     def _(x: str) -> None:
+    #         # Check for strict ISO 8601 format (must contain 'T' separator for datetime)
+    #         # We need to be more specific: if the string looks like a datetime but uses space instead of 'T'
+    #         if re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', x):
+    #             raise ValidationError(Constraint("datetime", message), invalid_value=x)
+    #
+    #         try:
+    #             dt_obj = datetime.fromisoformat(x)
+    #         except ValueError:
+    #             raise ValidationError(Constraint("datetime", message), invalid_value=x)
+    #
+    #         # Validate offset presence based on allow_offset
+    #         if not allow_offset and dt_obj.tzinfo is not None:
+    #             raise ValidationError(Constraint("datetime", message), invalid_value=x)
+    #
+    #         # Validate fractional second precision
+    #         if precision is not None:
+    #             actual_microseconds = dt_obj.microsecond
+    #             if precision == 0:  # No fractional seconds allowed
+    #                 if actual_microseconds != 0:
+    #                     raise ValidationError(Constraint("datetime", message), invalid_value=x)
+    #             elif precision == 3:  # Milliseconds allowed (0-3 significant digits)
+    #                 # Check if there are non-zero digits beyond milliseconds (i.e., microsecond % 1000 != 0)
+    #                 # For example, 0.123456 seconds has 123456 microseconds.
+    #                 # If precision=3, we only want 123000. So 123456 should fail.
+    #                 # `actual_microseconds % 1000 != 0` correctly identifies this.
+    #                 if actual_microseconds % 1000 != 0:
+    #                     raise ValidationError(Constraint("datetime", message), invalid_value=x)
+    #             # For precision == 6, fromisoformat handles up to 6 digits, so no further check needed.
+    #
+    #     return self.test(_)
+
+    def date(self, message: ErrorMessage = locale["date"]) -> Self:
+        """
+        Adds a validation rule to ensure the string is a valid ISO 8601 date (YYYY-MM-DD).
+
+        This method attempts to parse the string using `datetime.date.fromisoformat()`.
+
+        Args:
+            message (ErrorMessage): The error message to use if the validation fails.
+                Defaults to the locale-defined message for "date".
+
+        Returns:
+            Self: The schema instance, allowing for method chaining.
+        """
+
+        def _(x: str) -> None:
+            try:
+                # datetime.date.fromisoformat only accepts YYYY-MM-DD format
+                # It will raise ValueError for any time components or invalid formats.
+                date.fromisoformat(x)
+            except ValueError:
+                raise ValidationError(Constraint("date", message), invalid_value=x)
+
+        return self.test(_)
 
     def ensure(self) -> Self:
         """
@@ -169,9 +250,20 @@ class StringSchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
         self._transforms.append(_)
         return self
 
-    # TODO:
-    # def trim(self, message: ErrorMessage):
-    #     ...
+    def trim(self) -> Self:
+        """
+        Adds a transformation to remove leading and trailing whitespace from the string.
+
+        This transformation uses Python's built-in `str.strip()` method.
+
+        Returns:
+            Self: The schema instance, allowing for method chaining.
+        """
+        def _(x: str) -> str:
+            return x.strip()
+
+        self._transforms.append(_)
+        return self
 
     def lowercase(self, message: ErrorMessage = locale["lowercase"]) -> Self:
         """
