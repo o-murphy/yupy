@@ -1,4 +1,4 @@
-name: Ruff
+name: Mypy
 
 on:
   pull_request:
