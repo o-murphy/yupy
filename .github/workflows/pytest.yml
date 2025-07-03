@@ -29,31 +29,31 @@ jobs:
       - name: Run tests
         run: uv run pytest --cov=yupy --cov-report term --cov-report=json:coverage.json
 
-      - name: Install "coverage-badge"
-        run: uv pip install coverage-badge
-
-      - name: Generate coverage badge
-        run: |
-          rm coverage.svg
-          uv run coverage-badge -o coverage.svg
-
-      - name: Commit and push coverage badge
-        # This step will only run if the workflow was triggered by a manual dispatch
-        # or a push event (if you add 'push' to the 'on' block).
-        # It avoids running on pull_request events to prevent infinite loops and permission issues with forks.
-        # if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet coverage.svg; then
-            echo "No changes to coverage.svg. Skipping commit."
-          else
-            git add coverage.svg
-            git add coverage.json
-            git commit -m "Update coverage badge"
-            # --- FIX IS HERE ---
-            git push origin "$GITHUB_REF_NAME" # Push to the current branch name
-            echo "Coverage badge updated and pushed."
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Install "coverage-badge"
+#        run: uv pip install coverage-badge
+#
+#      - name: Generate coverage badge
+#        run: |
+#          rm coverage.svg
+#          uv run coverage-badge -o coverage.svg
+#
+#      - name: Commit and push coverage badge
+#        # This step will only run if the workflow was triggered by a manual dispatch
+#        # or a push event (if you add 'push' to the 'on' block).
+#        # It avoids running on pull_request events to prevent infinite loops and permission issues with forks.
+#        # if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+#        run: |
+#          git config user.name "github-actions[bot]"
+#          git config user.email "github-actions[bot]@users.noreply.github.com"
+#          if git diff --quiet coverage.svg; then
+#            echo "No changes to coverage.svg. Skipping commit."
+#          else
+#            git add coverage.svg
+#            git add coverage.json
+#            git commit -m "Update coverage badge"
+#            # --- FIX IS HERE ---
+#            git push origin "$GITHUB_REF_NAME" # Push to the current branch name
+#            echo "Coverage badge updated and pushed."
+#          fi
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
