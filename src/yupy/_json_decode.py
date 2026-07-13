@@ -1,8 +1,8 @@
 import json
 import warnings
-from typing import Any, Literal, TypedDict, Optional, Union
+from typing import Any, Literal, TypedDict
 
-orjson: Optional[Any]
+orjson: Any | None
 
 # Attempt to import orjson; if not available, fall back to None
 try:
@@ -11,9 +11,9 @@ except ImportError:
     orjson = None
 
 __all__ = (
-    'SUPPORTED_JSON_PARSER',
-    'loads',
-    'get_json_parser',
+    "SUPPORTED_JSON_PARSER",
+    "loads",
+    "get_json_parser",
 )
 
 # Define a TypeVar for the parser type (e.g., "json" or "orjson")
@@ -22,6 +22,7 @@ SUPPORTED_JSON_PARSER = Literal["json", "orjson"]
 
 class JsonLoadsKwargs(TypedDict, total=False):
     """Represents options typically used with the standard 'json' library."""
+
     cls: Any
     object_hook: Any
     parse_float: Any
@@ -48,7 +49,7 @@ def get_json_parser(parser: SUPPORTED_JSON_PARSER) -> Any:
         if orjson is None:
             warnings.warn(
                 "orjson is not installed. Falling back to the standard 'json' library.",
-                UserWarning
+                UserWarning,
             )
             return json  # Fallback to json module
         return orjson
@@ -57,13 +58,18 @@ def get_json_parser(parser: SUPPORTED_JSON_PARSER) -> Any:
     else:
         # This case should ideally be caught by type checkers due to Literal,
         # but provides a robust runtime check.
-        raise ValueError(f"Unsupported parser specified: '{parser}'. Must be 'json' or 'orjson'.")
+        raise ValueError(
+            f"Unsupported parser specified: '{parser}'. Must be 'json' or 'orjson'."
+        )
 
 
 def loads(
-        fp: Union[bytes, bytearray, memoryview, str],  # Reverted to str as per user's latest code
-        parser: SUPPORTED_JSON_PARSER,  # The parser type is constrained to "json" or "orjson"
-        **kwargs: JsonLoadsKwargs  # Accept any keyword arguments, to be filtered later
+    fp: bytes
+    | bytearray
+    | memoryview
+    | str,  # Reverted to str as per user's latest code
+    parser: SUPPORTED_JSON_PARSER,  # The parser type is constrained to "json" or "orjson"
+    **kwargs: JsonLoadsKwargs,  # Accept any keyword arguments, to be filtered later
 ) -> Any:
     """
     Parses a JSON string or byte-like object using either 'json' or 'orjson' library.
@@ -92,7 +98,7 @@ def loads(
             warnings.warn(
                 f"Unsupported arguments passed to orjson.loads: {', '.join(unsupported_keys)}. "
                 "These arguments will be ignored.",
-                UserWarning
+                UserWarning,
             )
         return orjson.loads(fp)
     else:  # This implies json_parser is json

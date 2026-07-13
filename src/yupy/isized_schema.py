@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Sized, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
+from collections.abc import Sized
 
 from typing_extensions import Self
 
@@ -8,7 +9,7 @@ from yupy.locale import locale
 from yupy.schema import Schema
 from yupy.validation_error import ValidationError, Constraint
 
-__all__ = ('ISizedSchema', 'SizedSchema')
+__all__ = ("ISizedSchema", "SizedSchema")
 
 
 @runtime_checkable
@@ -84,7 +85,9 @@ class SizedSchema(Schema):
 
         def _(x: Sized) -> None:  # Use Sized instead of Iterable
             if len(x) != limit:
-                raise ValidationError(Constraint("length", message, limit), invalid_value=x)
+                raise ValidationError(
+                    Constraint("length", message, limit), invalid_value=x
+                )
 
         return self.test(_)
 
@@ -103,7 +106,9 @@ class SizedSchema(Schema):
 
         def _(x: Sized) -> None:  # Use Sized instead of Iterable
             if len(x) < limit:
-                raise ValidationError(Constraint("min", message, limit), invalid_value=x)
+                raise ValidationError(
+                    Constraint("min", message, limit), invalid_value=x
+                )
 
         return self.test(_)
 
@@ -122,6 +127,8 @@ class SizedSchema(Schema):
 
         def _(x: Sized) -> None:  # Use Sized instead of Iterable
             if len(x) > limit:
-                raise ValidationError(Constraint("max", message, limit), invalid_value=x)
+                raise ValidationError(
+                    Constraint("max", message, limit), invalid_value=x
+                )
 
         return self.test(_)

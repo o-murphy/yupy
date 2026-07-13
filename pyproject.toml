@@ -1,12 +1,10 @@
 [build-system]
-requires = ["setuptools>=80.1.0"]
+requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "yupy"
-authors = [
-    { name = "o-murphy" },
-]
+authors = [{ name = "o-murphy" }]
 
 description = "Dead simple Object schema validation for python"
 readme = "README.md"
@@ -27,9 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
 ]
-dependencies = [
-    "typing-extensions>=4.13.2",
-]
+dependencies = ["typing-extensions>=4.13.2"]
 dynamic = ["version"]
 
 
@@ -40,15 +36,15 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 orjson = [
-    "orjson>=3.10.18",
+    "orjson>=3.10.18"
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["yupy*"]
 
-[tool.setuptools.dynamic]
-version = { file = "VERSION" }
+[tool.setuptools_scm]
+fallback_version = "0.0.0.dev0"
 
 [tool.pytest]
 testpaths = ["tests"]
@@ -62,9 +58,9 @@ extend-exclude = ["__init__.py"]
 [dependency-groups]
 dev = [
     "coverage-badge>=1.1.2",
-    "mypy>=1.15.0",
+    "mypy>=2.2.0",
     "orjson>=3.10.18",
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
-    "ruff>=0.12.1",
+    "ruff>=0.15.21",
 ]

@@ -1,10 +1,6 @@
 from yupy import json, mapping, number
 
-s = json(
-    mapping().shape({
-        "a": number()
-    }), json_parser='orjson'
-)
+s = json(mapping().shape({"a": number()}), json_parser="orjson")
 
 print(s.validate('{"a": 0}'))
 

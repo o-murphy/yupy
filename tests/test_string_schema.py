@@ -25,19 +25,24 @@ def reset_locale_for_string_schema_tests():
         "max": "Too long",
         "date": "Value must be a valid ISO 8601 date (YYYY-MM-DD)",  # Added
         "datetime": "Value must be a valid ISO 8601 datetime",  # Added
-        "one_of": lambda args: f"Must be one of {args[0]}",  # Added for NumberSchema.round error
+        "one_of": lambda args: (
+            f"Must be one of {args[0]}"
+        ),  # Added for NumberSchema.round error
         "nullable": "Value can't be null",  # Added for completeness
-        "type": lambda args: f"Value is not of type {args[0]}, got {args[1]}",  # Added for completeness
+        "type": lambda args: (
+            f"Value is not of type {args[0]}, got {args[1]}"
+        ),  # Added for completeness
     }
 
-    with patch('yupy.locale') as mock_locale_module:
+    with patch("yupy.locale") as mock_locale_module:
         # Set the 'locale' attribute of the mocked module to our dictionary
         mock_locale_module.locale = mock_locale_data
         # Mock get_error_message to retrieve from our mocked locale dictionary
         # This ensures that when get_error_message(key) is called, it returns
         # the corresponding message from mock_locale_data.
-        mock_locale_module.get_error_message.side_effect = lambda key: mock_locale_data.get(key,
-                                                                                            "Undefined error message")
+        mock_locale_module.get_error_message.side_effect = lambda key: (
+            mock_locale_data.get(key, "Undefined error message")
+        )
 
         yield mock_locale_module
 
@@ -50,7 +55,10 @@ def test_string_schema_creation():
 def test_string_schema_email_success():
     schema = StringSchema().email()
     assert schema.validate("test@example.com") == "test@example.com"
-    assert schema.validate("another.one@sub.domain.co.uk") == "another.one@sub.domain.co.uk"
+    assert (
+        schema.validate("another.one@sub.domain.co.uk")
+        == "another.one@sub.domain.co.uk"
+    )
 
 
 def test_string_schema_email_failure():
@@ -73,7 +81,10 @@ def test_string_schema_email_with_custom_message():
 def test_string_schema_url_success():
     schema = StringSchema().url()
     assert schema.validate("http://example.com") == "http://example.com"
-    assert schema.validate("https://www.example.co.uk/path?query=1") == "https://www.example.co.uk/path?query=1"
+    assert (
+        schema.validate("https://www.example.co.uk/path?query=1")
+        == "https://www.example.co.uk/path?query=1"
+    )
 
 
 def test_string_schema_url_failure():
@@ -94,7 +105,9 @@ def test_string_schema_url_with_custom_message():
 
 
 def test_uuid_success():
-    schema = StringSchema().uuid().not_nullable()  # Added not_nullable for explicit clarity, though redundant
+    schema = (
+        StringSchema().uuid().not_nullable()
+    )  # Added not_nullable for explicit clarity, though redundant
     uuid_str_1 = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
     result = schema.validate(uuid_str_1)
     assert result == uuid_str_1
@@ -143,7 +156,9 @@ def test_matches_with_custom_message():
 
 def test_matches_exclude_empty():
     # Test with exclude_empty=True and empty string
-    schema_exclude_empty = StringSchema().matches(re.compile(r"^\d+$"), exclude_empty=True)
+    schema_exclude_empty = StringSchema().matches(
+        re.compile(r"^\d+$"), exclude_empty=True
+    )
     assert schema_exclude_empty.validate("") == ""
 
     # Test with exclude_empty=True and non-empty string that matches
@@ -402,5 +417,6 @@ def test_date_with_custom_message():
         schema.validate("01-01-2023")
     assert excinfo.value.constraint.type == "date"
     assert excinfo.value.constraint.format_message == custom_message
+
 
 # endregion

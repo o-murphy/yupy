@@ -1,5 +1,5 @@
 from dataclasses import field, dataclass
-from typing import Any, List, Optional
+from typing import Any
 
 from typing_extensions import Self
 
@@ -8,7 +8,7 @@ from yupy.ischema import TransformFunc, ValidatorFunc, _SchemaExpectedType
 from yupy.locale import locale, ErrorMessage
 from yupy.validation_error import ValidationError, Constraint
 
-__all__ = ('Schema',)
+__all__ = ("Schema",)
 
 
 @dataclass
@@ -30,19 +30,20 @@ class Schema:
         message (ErrorMessage): message of type ValidationError
         _type (_SchemaExpectedType): The expected Python type(s) for the schema's value.
             Defaults to `object`, meaning any type is initially allowed.
-        _transforms (List[TransformFunc]): A list of transformation functions
+        _transforms (list[TransformFunc]): A list of transformation functions
             applied to the value before validation. Initialized as an empty list.
-        _validators (List[ValidatorFunc]): A list of custom validator functions
+        _validators (list[ValidatorFunc]): A list of custom validator functions
             applied to the value after transformations and type checks. Initialized as an empty list.
         _nullability (bool): Indicates whether the schema allows `None` as a valid value.
             Defaults to `False`.
         _not_nullable (ErrorMessage): The error message to use when a non-nullable
             field receives `None`. Defaults to the locale-defined message for "not_nullable".
     """
-    message: ErrorMessage = field(default=locale['type'])
+
+    message: ErrorMessage = field(default=locale["type"])
     _type: _SchemaExpectedType = field(default=object)
-    _transforms: List[TransformFunc] = field(init=False, default_factory=list)
-    _validators: List[ValidatorFunc] = field(init=False, default_factory=list)
+    _transforms: list[TransformFunc] = field(init=False, default_factory=list)
+    _validators: list[ValidatorFunc] = field(init=False, default_factory=list)
     _nullability: bool = False
     _not_nullable: ErrorMessage = locale["not_nullable"]
 
@@ -95,8 +96,7 @@ class Schema:
         """
         if not self._nullability and value is None:
             raise ValidationError(
-                Constraint("nullable", self._not_nullable),
-                invalid_value=value
+                Constraint("nullable", self._not_nullable), invalid_value=value
             )
 
     def _type_check(self, value: Any) -> None:
@@ -118,7 +118,7 @@ class Schema:
         if not isinstance(value, type_):
             raise ValidationError(
                 Constraint("type", self.message, type_, type(value)),
-                invalid_value=value
+                invalid_value=value,
             )
 
     def transform(self, func: TransformFunc) -> Self:
@@ -135,7 +135,7 @@ class Schema:
         Returns:
             Self: The schema instance, allowing for method chaining.
         """
-        self._transforms: List[TransformFunc]
+        self._transforms: list[TransformFunc]
         self._transforms.append(func)
         return self
 
@@ -172,7 +172,9 @@ class Schema:
         self._validators.append(func)
         return self
 
-    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
+    def validate(
+        self, value: Any = None, abort_early: bool = True, path: str = "~"
+    ) -> Any:
         """
         Validates the given value against the schema's rules.
 
@@ -217,12 +219,16 @@ class Schema:
         except ValidationError as err:
             raise ValidationError(err.constraint, path, invalid_value=value)
 
-    def const(self, value: Optional[_SchemaExpectedType], message: ErrorMessage = locale["const"]) -> Self:
+    def const(
+        self,
+        value: _SchemaExpectedType | None,
+        message: ErrorMessage = locale["const"],
+    ) -> Self:
         """
         Configures the schema to validate that the value is strictly equal to a constant.
 
         Args:
-            value (Optional[_SchemaExpectedType]): The constant value that the
+            value (_SchemaExpectedType | None): The constant value that the
                 validated input must match.
             message (ErrorMessage): The error message to use if the value does not match
                 the constant. Defaults to the locale-defined message for "const".
@@ -233,6 +239,8 @@ class Schema:
 
         def _(x: Any) -> None:
             if x != value:
-                raise ValidationError(Constraint("const", message, value), invalid_value=x)
+                raise ValidationError(
+                    Constraint("const", message, value), invalid_value=x
+                )
 
         return self.test(_)

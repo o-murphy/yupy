@@ -1,6 +1,6 @@
 from copy import deepcopy
 from json import JSONDecodeError
-from typing import Any, TypeVar, Protocol, runtime_checkable, Union
+from typing import Any, TypeVar, Protocol, runtime_checkable
 
 from typing_extensions import Self
 
@@ -12,13 +12,13 @@ from yupy.validation_error import ValidationError, Constraint, _EMPTY_MESSAGE_
 _REQUIRED_UNDEFINED_ = TypeVar("_REQUIRED_UNDEFINED_")
 
 __all__ = (
-    'ISchemaAdapter',
-    'SchemaAdapter',
-    'SchemaJsonAdapter',
-    'SchemaDefaultAdapter',
-    'SchemaRequiredAdapter',
-    'SchemaImmutableAdapter',
-    '_REQUIRED_UNDEFINED_',
+    "ISchemaAdapter",
+    "SchemaAdapter",
+    "SchemaJsonAdapter",
+    "SchemaDefaultAdapter",
+    "SchemaRequiredAdapter",
+    "SchemaImmutableAdapter",
+    "_REQUIRED_UNDEFINED_",
 )
 
 
@@ -32,27 +32,30 @@ class ISchemaAdapter(Protocol):
     or ensuring immutability.
 
     Attributes:
-        _schema (Union[ISchema, 'ISchemaAdapter']): The underlying schema
+        _schema (ISchema | 'ISchemaAdapter'): The underlying schema
             that this adapter wraps.
         _message (ErrorMessage): The default error message for this adapter's
             specific validation logic.
     """
-    _schema: Union[ISchema, 'ISchemaAdapter']
+
+    _schema: "ISchema | ISchemaAdapter"
     _message: ErrorMessage
 
-    # def __init__(self, schema: Union[ISchema, 'ISchemaAdapter'],
+    # def __init__(self, schema: ISchema | 'ISchemaAdapter',
     #              message: ErrorMessage = _EMPTY_MESSAGE_) -> None: ...
 
     @property
-    def schema(self) -> Union[ISchema, 'ISchemaAdapter']:
+    def schema(self) -> "ISchema | ISchemaAdapter":
         """
         Returns the underlying schema wrapped by this adapter.
 
         Returns:
-            Union[ISchema, 'ISchemaAdapter']: The wrapped schema.
+            ISchema | 'ISchemaAdapter': The wrapped schema.
         """
 
-    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
+    def validate(
+        self, value: Any = None, abort_early: bool = True, path: str = "~"
+    ) -> Any:
         """
         Validates the given value using the adapter's logic and the wrapped schema.
 
@@ -83,11 +86,15 @@ class SchemaAdapter:
             that this adapter wraps.
         _message (ErrorMessage): The default error message for this adapter.
     """
-    _schema: Union[ISchema, ISchemaAdapter]
+
+    _schema: ISchema | ISchemaAdapter
     _message: ErrorMessage
 
-    def __init__(self, schema: Union[ISchema, ISchemaAdapter],
-                 message: ErrorMessage = _EMPTY_MESSAGE_) -> None:
+    def __init__(
+        self,
+        schema: ISchema | ISchemaAdapter,
+        message: ErrorMessage = _EMPTY_MESSAGE_,
+    ) -> None:
         """
         Initializes a new SchemaAdapter instance.
 
@@ -100,7 +107,7 @@ class SchemaAdapter:
         self._message = message
 
     @property
-    def schema(self) -> Union[ISchema, ISchemaAdapter]:
+    def schema(self) -> ISchema | ISchemaAdapter:
         """
         Returns the underlying schema wrapped by this adapter.
 
@@ -109,7 +116,9 @@ class SchemaAdapter:
         """
         return self._schema
 
-    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
+    def validate(
+        self, value: Any = None, abort_early: bool = True, path: str = "~"
+    ) -> Any:
         """
         Validates the given value by delegating to the wrapped schema's validate method.
 
@@ -141,13 +150,16 @@ class SchemaDefaultAdapter(SchemaAdapter):
         _default (Any): The default value to use.
         _ensure (bool): If True, the default value is returned on validation error.
     """
+
     _default: Any
     _ensure: bool
 
-    def __init__(self,
-                 default_value: Any,
-                 schema: Union[ISchema, ISchemaAdapter],
-                 message: ErrorMessage = _EMPTY_MESSAGE_):
+    def __init__(
+        self,
+        default_value: Any,
+        schema: ISchema | ISchemaAdapter,
+        message: ErrorMessage = _EMPTY_MESSAGE_,
+    ):
         """
         Initializes a new SchemaDefaultAdapter instance.
 
@@ -171,7 +183,9 @@ class SchemaDefaultAdapter(SchemaAdapter):
         self._ensure = True
         return self
 
-    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
+    def validate(
+        self, value: Any = None, abort_early: bool = True, path: str = "~"
+    ) -> Any:
         """
         Validates the given value, applying the default if the input is `None`.
 
@@ -211,8 +225,11 @@ class SchemaRequiredAdapter(SchemaAdapter):
     delegated to the wrapped schema.
     """
 
-    def __init__(self, schema: Union[ISchema, ISchemaAdapter],
-                 message: ErrorMessage = locale['required']):
+    def __init__(
+        self,
+        schema: ISchema | ISchemaAdapter,
+        message: ErrorMessage = locale["required"],
+    ):
         """
         Initializes a new SchemaRequiredAdapter instance.
 
@@ -223,7 +240,13 @@ class SchemaRequiredAdapter(SchemaAdapter):
         """
         super().__init__(schema, message)
 
-    def validate(self, value: Any = _REQUIRED_UNDEFINED_, abort_early: bool = True, path: str = "~", path_=None) -> Any:
+    def validate(
+        self,
+        value: Any = _REQUIRED_UNDEFINED_,
+        abort_early: bool = True,
+        path: str = "~",
+        path_=None,
+    ) -> Any:
         """
         Validates the given value, ensuring it is not `_REQUIRED_UNDEFINED_`.
 
@@ -247,15 +270,17 @@ class SchemaRequiredAdapter(SchemaAdapter):
         """
         if value is _REQUIRED_UNDEFINED_:
             raise ValidationError(
-                Constraint("required", self._message, path),
-                path, invalid_value=value
+                Constraint("required", self._message, path), path, invalid_value=value
             )
         return self._schema.validate(value, abort_early, path)
 
 
 class SchemaImmutableAdapter(SchemaAdapter):
-    def __init__(self, schema: Union[ISchema, ISchemaAdapter],
-                 message: ErrorMessage = _EMPTY_MESSAGE_):
+    def __init__(
+        self,
+        schema: ISchema | ISchemaAdapter,
+        message: ErrorMessage = _EMPTY_MESSAGE_,
+    ):
         """
         Initializes a new SchemaImmutableAdapter instance.
 
@@ -266,7 +291,13 @@ class SchemaImmutableAdapter(SchemaAdapter):
         """
         super().__init__(schema, message)
 
-    def validate(self, value: Any = _REQUIRED_UNDEFINED_, abort_early: bool = True, path: str = "~", path_=None) -> Any:
+    def validate(
+        self,
+        value: Any = _REQUIRED_UNDEFINED_,
+        abort_early: bool = True,
+        path: str = "~",
+        path_=None,
+    ) -> Any:
         """
         Validates the given value by deep copying it and passing the copy to the
         wrapped schema. The original value is always returned.
@@ -307,14 +338,16 @@ class SchemaJsonAdapter(SchemaAdapter):
         _json_parser (SUPPORTED_JSON_PARSER): The name of the JSON parsing library
             to use ("json" or "orjson").
     """
+
     _json_parser: SUPPORTED_JSON_PARSER
 
-    def __init__(self,
-                 schema: Union[ISchema, ISchemaAdapter],
-                 message: ErrorMessage = locale['json'],
-                 *,
-                 json_parser: SUPPORTED_JSON_PARSER = "json",
-                 ):
+    def __init__(
+        self,
+        schema: ISchema | ISchemaAdapter,
+        message: ErrorMessage = locale["json"],
+        *,
+        json_parser: SUPPORTED_JSON_PARSER = "json",
+    ):
         """
         Initializes a new SchemaJsonAdapter instance.
 
@@ -330,7 +363,9 @@ class SchemaJsonAdapter(SchemaAdapter):
         super().__init__(schema, message)
         self._json_parser = json_parser
 
-    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
+    def validate(
+        self, value: Any = None, abort_early: bool = True, path: str = "~"
+    ) -> Any:
         """
         Parses the input value as JSON and then optionally validates it against the schema.
 
@@ -368,8 +403,6 @@ class SchemaJsonAdapter(SchemaAdapter):
             value = loads(value, self._json_parser)
         except JSONDecodeError as err:
             raise ValidationError(
-                Constraint("json", self._message, origin=err),
-                path,
-                invalid_value=value
+                Constraint("json", self._message, origin=err), path, invalid_value=value
             )
         return self._schema.validate(value, abort_early, path)

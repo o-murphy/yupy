@@ -1,13 +1,14 @@
-from typing import Optional, Literal, TypedDict, TypeAlias, Union, Callable, Any, List
+from collections.abc import Callable
+from typing import Literal, TypedDict, TypeAlias, Any
 
 __all__ = (
-    'locale',
-    'set_locale',
-    'get_error_message',
-    'ErrorMessage',
+    "locale",
+    "set_locale",
+    "get_error_message",
+    "ErrorMessage",
 )
 
-ErrorMessage: TypeAlias = Union[str, Callable[[Any | List[Any]], str]]
+ErrorMessage: TypeAlias = str | Callable[[Any | list[Any]], str]
 """
 Type alias for an error message.
 
@@ -25,6 +26,7 @@ class Locale(TypedDict, total=False):
     `total=False` indicates that not all keys are required to be present
     when creating a `Locale` instance.
     """
+
     const: ErrorMessage
     type: ErrorMessage
     min: ErrorMessage
@@ -61,11 +63,39 @@ class Locale(TypedDict, total=False):
 
 
 LocaleKey = Literal[
-    "const", "type", "min", "max", "length", "required", "nullable", "not_nullable", "test", "matches",
-    "email", "url", "uuid", "lowercase", "uppercase",
-    "le", "ge", "lt", "gt", "eq", "ne",
-    "integer", "multiple_of", "positive", "negative", "date", "datetime",
-    "array", "mapping", "strict", "one_of", "json", "undefined"
+    "const",
+    "type",
+    "min",
+    "max",
+    "length",
+    "required",
+    "nullable",
+    "not_nullable",
+    "test",
+    "matches",
+    "email",
+    "url",
+    "uuid",
+    "lowercase",
+    "uppercase",
+    "le",
+    "ge",
+    "lt",
+    "gt",
+    "eq",
+    "ne",
+    "integer",
+    "multiple_of",
+    "positive",
+    "negative",
+    "date",
+    "datetime",
+    "array",
+    "mapping",
+    "strict",
+    "one_of",
+    "json",
+    "undefined",
 ]
 """
 Literal type defining all valid keys for the `locale` dictionary.
@@ -83,7 +113,7 @@ locale: Locale = {
     "nullable": "Value can't be null",
     "not_nullable": "Value can't be null",
     "test": "Test failed",
-    'matches': "Don't match regex",  # FIXME
+    "matches": "Don't match regex",  # FIXME
     "email": "Value must be a valid email",
     "url": "Value must be a valid URL",
     "uuid": "Value must be a valid UUID",
@@ -101,10 +131,12 @@ locale: Locale = {
     "array": "Invalid array",
     "mapping": "Invalid mapping",
     "multiple_of": lambda args: "Value must be a multiple of %r" % args,
-    "strict": lambda args: "Object contains unknown keys: %s" % (", ".join(map(repr, args)),),
+    "strict": lambda args: (
+        "Object contains unknown keys: %s" % (", ".join(map(repr, args)),)
+    ),
     "one_of": lambda args: "Must be one of %r" % args,
     "json": lambda args: "Value must be a valid JSON",
-    "undefined": "Undefined validation error"
+    "undefined": "Undefined validation error",
 }
 """
 The default locale dictionary containing various error messages.
@@ -115,7 +147,7 @@ arguments.
 """
 
 
-def set_locale(locale_: Optional[Locale] = None) -> Locale:
+def set_locale(locale_: Locale | None = None) -> Locale:
     """
     Sets or updates the global locale dictionary with custom error messages.
 
@@ -124,7 +156,7 @@ def set_locale(locale_: Optional[Locale] = None) -> Locale:
     `locale` dictionary is returned without modification.
 
     Args:
-        locale_ (Optional[Locale]): A dictionary of locale messages to set or update.
+        locale_ (Locale | None): A dictionary of locale messages to set or update.
             If None, the current locale is returned.
 
     Returns:

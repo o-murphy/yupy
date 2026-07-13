@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from typing_extensions import Self
 
@@ -8,7 +9,7 @@ from yupy.ischema import _SchemaExpectedType
 from yupy.locale import locale, ErrorMessage
 from yupy.validation_error import Constraint, ValidationError
 
-__all__ = ('MixedSchema',)
+__all__ = ("MixedSchema",)
 
 
 @dataclass
@@ -23,9 +24,12 @@ class MixedSchema(EqualityComparableSchema):
         _type (_SchemaExpectedType): The expected Python type(s) for the schema's value.
             Defaults to `object`, meaning any type is initially allowed.
     """
+
     _type: _SchemaExpectedType = field(default=object)
 
-    def of(self, type_: _SchemaExpectedType, message: ErrorMessage = locale["type"]) -> Self:
+    def of(
+        self, type_: _SchemaExpectedType, message: ErrorMessage = locale["type"]
+    ) -> Self:
         """
         Adds a validation rule to ensure the value is of a specific type or types.
 
@@ -47,13 +51,12 @@ class MixedSchema(EqualityComparableSchema):
                 return
             if not isinstance(x, type_):
                 raise ValidationError(
-                    Constraint("type", message, type_, type(x)),
-                    invalid_value=x
+                    Constraint("type", message, type_, type(x)), invalid_value=x
                 )
 
         return self.test(_)
 
-    def one_of(self, items: Iterable, message: ErrorMessage = locale['one_of']) -> Self:
+    def one_of(self, items: Iterable, message: ErrorMessage = locale["one_of"]) -> Self:
         """
         Adds a validation rule to check if the value is one of the provided items.
 
@@ -69,6 +72,8 @@ class MixedSchema(EqualityComparableSchema):
 
         def _(x: Any) -> None:
             if x not in items:
-                raise ValidationError(Constraint('one_of', message, items), invalid_value=x)
+                raise ValidationError(
+                    Constraint("one_of", message, items), invalid_value=x
+                )
 
         return self.test(_)

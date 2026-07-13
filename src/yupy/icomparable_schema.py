@@ -8,10 +8,10 @@ from yupy.schema import Schema
 from yupy.validation_error import ValidationError, Constraint
 
 __all__ = (
-    'IEqualityComparableSchema',
-    'IComparableSchema',
-    'EqualityComparableSchema',
-    'ComparableSchema',
+    "IEqualityComparableSchema",
+    "IComparableSchema",
+    "EqualityComparableSchema",
+    "ComparableSchema",
 )
 
 

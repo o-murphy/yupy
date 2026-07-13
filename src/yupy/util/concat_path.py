@@ -1,9 +1,7 @@
-from typing import Union
-
-__all__ = ('concat_path',)
+__all__ = ("concat_path",)
 
 
-def concat_path(path: str, item: Union[str, int]) -> str:
+def concat_path(path: str, item: str | int) -> str:
     """
     Concatenates a path string with an item (either a string or an integer)
     to create a new path.

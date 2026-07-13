@@ -67,7 +67,9 @@ def test_of_failure_non_matching_type():
     assert error.path == "~"  # Default path from Schema.validate
     assert error.invalid_value == "not_an_int"
     # The locale's 'type' message is a callable, so we simulate its call
-    expected_message = locale["type"]((int, type("not_an_int")))  # Expected type and actual type
+    expected_message = locale["type"](
+        (int, type("not_an_int"))
+    )  # Expected type and actual type
     assert error.constraint.format_message == expected_message
 
 
@@ -105,7 +107,9 @@ def test_one_of_failure():
     assert error.constraint.type == "one_of"
     assert error.path == "~"
     assert error.invalid_value == "grape"
-    expected_message = locale["one_of"]((["apple", "banana", "cherry"],))  # Items passed to one_of
+    expected_message = locale["one_of"](
+        (["apple", "banana", "cherry"],)
+    )  # Items passed to one_of
     assert error.constraint.format_message == expected_message
 
 
