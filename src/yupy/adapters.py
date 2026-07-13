@@ -32,7 +32,7 @@ class ISchemaAdapter(Protocol):
     or ensuring immutability.
 
     Attributes:
-        _schema (Union[ISchema, 'ISchemaAdapter']): The underlying schema
+        _schema (ISchema | 'ISchemaAdapter'): The underlying schema
             that this adapter wraps.
         _message (ErrorMessage): The default error message for this adapter's
             specific validation logic.
@@ -41,7 +41,7 @@ class ISchemaAdapter(Protocol):
     _schema: "ISchema | ISchemaAdapter"
     _message: ErrorMessage
 
-    # def __init__(self, schema: Union[ISchema, 'ISchemaAdapter'],
+    # def __init__(self, schema: ISchema | 'ISchemaAdapter',
     #              message: ErrorMessage = _EMPTY_MESSAGE_) -> None: ...
 
     @property
@@ -50,7 +50,7 @@ class ISchemaAdapter(Protocol):
         Returns the underlying schema wrapped by this adapter.
 
         Returns:
-            Union[ISchema, 'ISchemaAdapter']: The wrapped schema.
+            ISchema | 'ISchemaAdapter': The wrapped schema.
         """
 
     def validate(
