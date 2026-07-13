@@ -38,14 +38,14 @@ class ISchemaAdapter(Protocol):
             specific validation logic.
     """
 
-    _schema: ISchema | "ISchemaAdapter"
+    _schema: "ISchema | ISchemaAdapter"
     _message: ErrorMessage
 
     # def __init__(self, schema: Union[ISchema, 'ISchemaAdapter'],
     #              message: ErrorMessage = _EMPTY_MESSAGE_) -> None: ...
 
     @property
-    def schema(self) -> ISchema | "ISchemaAdapter":
+    def schema(self) -> "ISchema | ISchemaAdapter":
         """
         Returns the underlying schema wrapped by this adapter.
 
