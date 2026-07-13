@@ -1,12 +1,13 @@
 from dataclasses import dataclass, field
-from typing import Generator, Any, List, Optional, Union
+from typing import Any
+from collections.abc import Generator
 
 from yupy.locale import get_error_message, ErrorMessage
 
 __all__ = (
-    'ValidationError',
-    'Constraint',
-    '_EMPTY_MESSAGE_',
+    "ValidationError",
+    "Constraint",
+    "_EMPTY_MESSAGE_",
 )
 
 _EMPTY_MESSAGE_: ErrorMessage = ""
@@ -31,26 +32,28 @@ class Constraint:
             the error message (e.g., the expected type, the limit for length).
         message (ErrorMessage): The raw error message template or string.
             This field is excluded from `repr()` to avoid verbosity.
-        origin: Optional[Exception]: wrapped exception.
+        origin: Exception | None: wrapped exception.
     """
-    type: Optional[str]
+
+    type: str | None
     args: Any
     message: ErrorMessage = field(repr=False)
-    origin: Optional[Exception]
+    origin: Exception | None
 
-    def __init__(self,
-                 type_: Optional[str] = "unknown",
-                 message: Optional[ErrorMessage] = _EMPTY_MESSAGE_,
-                 *args: Any,
-                 origin: Optional[Exception] = None,
-                 ):
+    def __init__(
+        self,
+        type_: str | None = "unknown",
+        message: ErrorMessage | None = _EMPTY_MESSAGE_,
+        *args: Any,
+        origin: Exception | None = None,
+    ):
         """
         Initializes a new Constraint instance.
 
         Args:
-            type_ (Optional[str]): The type of the constraint (e.g., "required").
+            type_ (str | None): The type of the constraint (e.g., "required").
                 Defaults to "undefined" if None.
-            message (Optional[ErrorMessage], optional): The specific error message
+            message (ErrorMessage | None, optional): The specific error message
                 for this constraint. If `None` or `_EMPTY_MESSAGE_`, the default
                 "undefined" message from the locale will be used. Defaults to `_EMPTY_MESSAGE_`.
             *args (Any): Positional arguments that will be passed to the message
@@ -59,7 +62,9 @@ class Constraint:
         self.type = type_ or "undefined"
         self.args = args
         self.origin = origin
-        if message is None or message is _EMPTY_MESSAGE_:  # Check against _EMPTY_MESSAGE_ for default behavior
+        if (
+            message is None or message is _EMPTY_MESSAGE_
+        ):  # Check against _EMPTY_MESSAGE_ for default behavior
             self.message = get_error_message("undefined")
         else:
             self.message = message
@@ -93,28 +98,32 @@ class ValidationError(ValueError):
         constraint (Constraint): The primary constraint that was violated for
             this specific error.
         path (str): The path within the validated data structure where the error occurred.
-        _errors (List[ValidationError]): A private list of nested `ValidationError`
+        _errors (list[ValidationError]): A private list of nested `ValidationError`
             instances, used when collecting multiple errors (e.g., for object or array schemas).
-        invalid_value (Optional[Any]): The value that failed validation.
+        invalid_value (Any): The value that failed validation.
     """
 
     def __init__(
-            self, constraint: Optional[Constraint] = None, path: str = "",
-            errors: Optional[List['ValidationError']] = None,
-            invalid_value: Optional[Any] = None, *args) -> None:
+        self,
+        constraint: Constraint | None = None,
+        path: str = "",
+        errors: list["ValidationError"] | None = None,
+        invalid_value: Any = None,
+        *args,
+    ) -> None:
         """
         Initializes a new ValidationError instance.
 
         Args:
-            constraint (Optional[Constraint], optional): The primary constraint
+            constraint (Constraint | None, optional): The primary constraint
                 that was violated. If None, a default "undefined" constraint is created.
                 Defaults to None.
             path (str, optional): The path within the data structure where the
                 error occurred. Defaults to "".
-            errors (Optional[List['ValidationError']], optional): A list of nested
+            errors (list['ValidationError'] | None, optional): A list of nested
                 `ValidationError` instances, used for collecting multiple errors.
                 Defaults to None.
-            invalid_value (Optional[Any], optional): The value that caused the validation
+            invalid_value (Any, optional): The value that caused the validation
                 failure. Defaults to None.
             *args: Additional arguments passed to the base `ValueError` constructor.
         """
@@ -123,8 +132,8 @@ class ValidationError(ValueError):
         else:
             self.constraint = constraint
         self.path = path
-        self._errors: List[ValidationError] = errors or []
-        self.invalid_value: Optional[Any] = invalid_value
+        self._errors: list[ValidationError] = errors or []
+        self.invalid_value: Any = invalid_value
         # The base ValueError constructor expects a single string or tuple of args
         # We pass self.path, self.constraint, self._errors as arguments to ValueError
         super().__init__(self.path, self.constraint, self._errors, *args)
@@ -136,7 +145,11 @@ class ValidationError(ValueError):
         Returns:
             str: A string in the format "(path='...', constraint=Constraint(...), message='...')".
         """
-        return "(path=%r, constraint=%r, message=%r)" % (self.path, self.constraint, self.constraint.format_message)
+        return "(path=%r, constraint=%r, message=%r)" % (
+            self.path,
+            self.constraint,
+            self.constraint.format_message,
+        )
 
     def __repr__(self) -> str:
         """
@@ -148,7 +161,7 @@ class ValidationError(ValueError):
         return "ValidationError%s" % self.__str__()
 
     @property
-    def errors(self) -> Generator['ValidationError', None, None]:
+    def errors(self) -> Generator["ValidationError", None, None]:
         """
         A generator that yields this validation error and all its nested errors recursively.
 
@@ -173,7 +186,7 @@ class ValidationError(ValueError):
         return "%r:%s" % (self.path, self.constraint.format_message)
 
     @property
-    def messages(self) -> Generator[Union[property, str], None, None]:
+    def messages(self) -> Generator[property | str, None, None]:
         """
         A generator that yields the concise message for this validation error
         and all its nested errors recursively.

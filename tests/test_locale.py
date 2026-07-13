@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any
 
 import pytest
 
@@ -29,7 +29,7 @@ def test_set_locale_with_new_values():
     new_messages = {
         "new_key": "This is a new message",
         "undefined": "Custom undefined message",
-        "const": lambda args: f"Custom const message for {args[0]}"  #
+        "const": lambda args: f"Custom const message for {args[0]}",  #
     }
     set_locale(new_messages)
 
@@ -77,7 +77,9 @@ def test_get_error_message_after_locale_update():
     """Test get_error_message behavior after locale has been updated."""
     set_locale({"custom_error": "This is a custom message"})
     assert get_error_message("custom_error") == "This is a custom message"
-    assert get_error_message("undefined") == "Undefined validation error"  # Original undefined should still be there
+    assert (
+        get_error_message("undefined") == "Undefined validation error"
+    )  # Original undefined should still be there
 
     set_locale({"undefined": "New default error"})
     assert get_error_message("undefined") == "New default error"
@@ -86,7 +88,7 @@ def test_get_error_message_after_locale_update():
 def test_error_message_type_alias():
     """Test that ErrorMessage type alias works as expected."""
 
-    def test_callable_message(args: Tuple[Any, ...]) -> str:
+    def test_callable_message(args: tuple[Any, ...]) -> str:
         return f"Callable message with {args[0]}"
 
     string_message: ErrorMessage = "A simple string message"

@@ -1,7 +1,11 @@
 import pytest
 
-from yupy.icomparable_schema import EqualityComparableSchema, ComparableSchema, IEqualityComparableSchema, \
-    IComparableSchema
+from yupy.icomparable_schema import (
+    EqualityComparableSchema,
+    ComparableSchema,
+    IEqualityComparableSchema,
+    IComparableSchema,
+)
 from yupy.locale import locale
 from yupy.schema import Schema
 from yupy.validation_error import ValidationError
@@ -206,7 +210,9 @@ def test_gt_failure():
 
 def test_multiple_comparable_constraints():
     """Test a schema with multiple comparable constraints."""
-    schema = ComparableSchema(_type=int).ge(5).le(15).lt(12).gt(7)  # Value must be > 7, <= 11
+    schema = (
+        ComparableSchema(_type=int).ge(5).le(15).lt(12).gt(7)
+    )  # Value must be > 7, <= 11
     result = schema.validate(8)
     assert result == 8
     result = schema.validate(11)

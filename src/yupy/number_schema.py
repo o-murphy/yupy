@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass, field
-from typing import Union, TypeAlias, TypeVar, Literal
+from typing import TypeAlias, TypeVar, Literal
 
 from typing_extensions import Self
 
@@ -9,12 +9,12 @@ from yupy.ischema import _SchemaExpectedType
 from yupy.locale import locale, ErrorMessage
 from yupy.validation_error import ValidationError, Constraint
 
-__all__ = ('NumberSchema',)
+__all__ = ("NumberSchema",)
 
-_T = TypeVar('_T')
-_NumberType: TypeAlias = Union[int, float]
+_T = TypeVar("_T")
+_NumberType: TypeAlias = int | float
 
-RoundingMethod = Literal['ceil', 'floor', 'round', 'trunc']
+RoundingMethod = Literal["ceil", "floor", "round", "trunc"]
 
 
 @dataclass
@@ -32,6 +32,7 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
         _type (_SchemaExpectedType): The expected Python type(s) for the schema's value.
             Initialized to `(float, int)` to allow both float and integer types.
     """
+
     _type: _SchemaExpectedType = field(init=False, default=(float, int))
 
     def positive(self, message: ErrorMessage = locale["positive"]) -> Self:
@@ -95,7 +96,7 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
         self._transforms.append(math.trunc)
         return self
 
-    def round(self, method: RoundingMethod = 'round') -> Self:
+    def round(self, method: RoundingMethod = "round") -> Self:
         """
         Adds a transformation to round the number based on the specified method.
 
@@ -113,25 +114,33 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
         Raises:
             ValueError: If an unsupported rounding method is provided.
         """
-        valid_methods = ['ceil', 'floor', 'round', 'trunc']  # Define valid methods for the error message
+        valid_methods = [
+            "ceil",
+            "floor",
+            "round",
+            "trunc",
+        ]  # Define valid methods for the error message
 
         # Use match statement to directly append the appropriate function
         match method:
-            case 'round':
+            case "round":
                 self._transforms.append(round)
-            case 'ceil':
+            case "ceil":
                 self._transforms.append(math.ceil)
-            case 'floor':
+            case "floor":
                 self._transforms.append(math.floor)
-            case 'trunc':
+            case "trunc":
                 self._transforms.append(math.trunc)
             case _:  # Default case for unsupported methods
                 raise ValueError("round method should be one of %s" % valid_methods)
 
         return self
 
-    def multiple_of(self, multiplier: Union[int, float],
-                    message: ErrorMessage = locale["multiple_of"]) -> Self:
+    def multiple_of(
+        self,
+        multiplier: int | float,
+        message: ErrorMessage = locale["multiple_of"],
+    ) -> Self:
         """
         Adds a validation rule to ensure the number is a multiple of a given multiplier.
 
@@ -145,8 +154,10 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
             Self: The schema instance, allowing for method chaining.
         """
 
-        def _(x: Union[int, float]) -> None:
+        def _(x: int | float) -> None:
             if x % multiplier != 0:
-                raise ValidationError(Constraint("multiple_of", message, multiplier), invalid_value=x)
+                raise ValidationError(
+                    Constraint("multiple_of", message, multiplier), invalid_value=x
+                )
 
         return self.test(_)

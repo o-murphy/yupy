@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, List, Union, Optional
+from typing import Any
 
 from typing_extensions import Self
 
@@ -11,7 +11,7 @@ from yupy.locale import locale
 from yupy.util.concat_path import concat_path
 from yupy.validation_error import Constraint, ValidationError
 
-__all__ = ('ArraySchema',)
+__all__ = ("ArraySchema",)
 
 
 @dataclass
@@ -28,18 +28,19 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
     Attributes:
         _type (_SchemaExpectedType): The expected Python type(s) for the schema's value.
             Initialized to `(list, tuple)` to accept both lists and tuples.
-        _fields (List[Union[ISchema, ISchemaAdapter]]): A list to potentially hold
+        _fields (lsit[Union[ISchema, ISchemaAdapter]]): A list to potentially hold
             schemas for specific indices (though currently not directly used for this
             purpose in the provided methods).
-        _of_schema_type (Optional[Union[ISchema, ISchemaAdapter]]): An optional schema
+        _of_schema_type (ISchema | ISchemaAdapter | None): An optional schema
             that defines the validation rules for each element within the array.
             If None, elements are not individually validated by this schema.
     """
-    _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
-    _fields: List[Union[ISchema, ISchemaAdapter]] = field(init=False, default_factory=list)
-    _of_schema_type: Optional[Union[ISchema, ISchemaAdapter]] = field(init=False, default=None)
 
-    def of(self, schema: Union[ISchema, ISchemaAdapter]) -> Self:
+    _type: _SchemaExpectedType = field(init=False, default=(list, tuple))
+    _fields: list[ISchema | ISchemaAdapter] = field(init=False, default_factory=list)
+    _of_schema_type: ISchema | ISchemaAdapter | None = field(init=False, default=None)
+
+    def of(self, schema: ISchema | ISchemaAdapter) -> Self:
         """
         Specifies the schema that each element in the array must conform to.
 
@@ -63,7 +64,9 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
         self._of_schema_type = schema
         return self
 
-    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
+    def validate(
+        self, value: Any = None, abort_early: bool = True, path: str = "~"
+    ) -> Any:
         """
         Validates the given value as an array.
 
@@ -88,10 +91,13 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
         value = super().validate(value, abort_early, path)
         if value is None and self._nullability:
             return None
-        return self._validate_array(value, abort_early, path)  # Convert tuple to list for iteration
+        return self._validate_array(
+            value, abort_early, path
+        )  # Convert tuple to list for iteration
 
-    def _validate_array(self, value: Union[list, tuple], abort_early: bool = True,
-                        path: str = "~") -> Union[list, tuple]:
+    def _validate_array(
+        self, value: list | tuple, abort_early: bool = True, path: str = "~"
+    ) -> list | tuple:
         """
         Internal method to perform element-wise validation of the array.
 
@@ -117,14 +123,16 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
         if self._of_schema_type is None:
             return value
 
-        errs: List[ValidationError] = []
+        errs: list[ValidationError] = []
         validated_result = []
         original_type = type(value)
 
         for i, item in enumerate(value):
             item_path = concat_path(path, i)
             try:
-                validated_item = self._of_schema_type.validate(item, abort_early, item_path)
+                validated_item = self._of_schema_type.validate(
+                    item, abort_early, item_path
+                )
                 validated_result.append(validated_item)
             except ValidationError as err:
                 if abort_early:
@@ -135,15 +143,17 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
 
         if errs:
             raise ValidationError(
-                Constraint('array', locale["array"], path),
-                path, errs, invalid_value=value
+                Constraint("array", locale["array"], path),
+                path,
+                errs,
+                invalid_value=value,
             )
 
         if original_type is tuple:
             return tuple(validated_result)
         return validated_result
 
-    def __getitem__(self, item: int) -> Union[ISchema, ISchemaAdapter]:
+    def __getitem__(self, item: int) -> ISchema | ISchemaAdapter:
         """
         Allows accessing schema definitions for specific array indices.
 

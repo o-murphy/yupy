@@ -3,7 +3,10 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from yupy.locale import locale as yupy_actual_locale, get_error_message as yupy_actual_get_error_message
+from yupy.locale import (
+    locale as yupy_actual_locale,
+    get_error_message as yupy_actual_get_error_message,
+)
 from yupy.number_schema import NumberSchema
 from yupy.schema import Schema
 from yupy.string_schema import StringSchema
@@ -17,7 +20,12 @@ def mock_yupy_locale():
     mock_locale_data = yupy_actual_locale.copy()
 
     # Patch the yupy.locale module itself, and set its attributes
-    with patch('yupy.locale', new=MagicMock(locale=mock_locale_data, get_error_message=yupy_actual_get_error_message)):
+    with patch(
+        "yupy.locale",
+        new=MagicMock(
+            locale=mock_locale_data, get_error_message=yupy_actual_get_error_message
+        ),
+    ):
         yield
 
 

@@ -118,7 +118,9 @@ def test_type_check_non_matching_type_raises_error():
     error = excinfo.value
     assert error.constraint.type == "type"
     # The message is a callable in locale, so we get the result of the callable
-    expected_message = locale["type"]((str, int))  # Simulate the args that would be passed
+    expected_message = locale["type"](
+        (str, int)
+    )  # Simulate the args that would be passed
     assert error.constraint.format_message == expected_message
     assert error.path == ""
     assert error.invalid_value == 123
@@ -177,9 +179,11 @@ def test_validate_success_no_transforms_no_validators():
 
 def test_validate_success_with_transforms_and_validators():
     """Test validate() success with transforms and validators."""
-    schema = Schema(_type=str) \
-        .transform(lambda x: x.strip()) \
+    schema = (
+        Schema(_type=str)
+        .transform(lambda x: x.strip())
         .test(lambda x: x if len(x) > 5 else pytest.fail("Length too short"))
+    )
 
     result = schema.validate("  long_string  ")
     assert result == "long_string"

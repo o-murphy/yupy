@@ -1,16 +1,12 @@
 from types import UnionType
-from typing import Protocol, TypeVar, Callable, Any, TypeAlias, runtime_checkable, List, Type, Optional, Union
+from typing import Protocol, TypeVar, Any, TypeAlias, runtime_checkable
+from collections.abc import Callable
 
 from typing_extensions import Self
 
 from yupy.locale import ErrorMessage
 
-__all__ = (
-    'ISchema',
-    'TransformFunc',
-    'ValidatorFunc',
-    '_SchemaExpectedType'
-)
+__all__ = ("ISchema", "TransformFunc", "ValidatorFunc", "_SchemaExpectedType")
 
 _T = TypeVar("_T")
 """
@@ -18,7 +14,7 @@ A generic TypeVar used to represent the type of the value being validated
 by a schema.
 """
 
-_SchemaExpectedType: TypeAlias = Union[type[_T], UnionType, tuple[Any, ...]]
+_SchemaExpectedType: TypeAlias = type[_T] | UnionType | tuple[Any, ...]
 """
 Type alias for the expected type(s) that a schema can validate against.
 
@@ -28,7 +24,7 @@ This can be:
 - A tuple of types (e.g., `(str, int)` for `isinstance` checks).
 """
 
-_P = TypeVar('_P', bound=_SchemaExpectedType)
+_P = TypeVar("_P", bound=_SchemaExpectedType)
 """
 A TypeVar used to bind the `ISchema` protocol to a specific `_SchemaExpectedType`,
 ensuring type consistency across the schema's validation methods.
@@ -63,18 +59,18 @@ class ISchema(Protocol[_P]):
 
     Attributes:
         _type (Type[_P]): The expected Python type(s) for the schema's value.
-        _transforms (List[TransformFunc]): A list of transformation functions
+        _transforms (list[TransformFunc]): A list of transformation functions
             applied to the value before validation.
-        _validators (List[ValidatorFunc]): A list of custom validator functions
+        _validators (list[ValidatorFunc]): A list of custom validator functions
             applied to the value.
         _nullability (bool): Indicates whether the schema allows `None` as a valid value.
         _not_nullable (ErrorMessage): The error message to use when a non-nullable
             field receives `None`.
     """
 
-    _type: Type[_P]
-    _transforms: List[TransformFunc]
-    _validators: List[ValidatorFunc]
+    _type: type[_P]
+    _transforms: list[TransformFunc]
+    _validators: list[ValidatorFunc]
     _nullability: bool
     _not_nullable: ErrorMessage
 
@@ -167,7 +163,9 @@ class ISchema(Protocol[_P]):
             Self: The schema instance, allowing for method chaining.
         """
 
-    def validate(self, value: Any = None, abort_early: bool = True, path: str = "") -> _P:
+    def validate(
+        self, value: Any = None, abort_early: bool = True, path: str = ""
+    ) -> _P:
         """
         Validates the given value against the schema's rules.
 
@@ -189,12 +187,12 @@ class ISchema(Protocol[_P]):
                 this error may contain a list of nested errors.
         """
 
-    def const(self, value: Optional[_P], message: ErrorMessage) -> Self:
+    def const(self, value: _P | None, message: ErrorMessage) -> Self:
         """
         Configures the schema to validate that the value is strictly equal to a constant.
 
         Args:
-            value (Optional[_P]): The constant value that the validated input must match.
+            value (_P | None): The constant value that the validated input must match.
             message (ErrorMessage): The error message to use if the value does not match
                 the constant.
 

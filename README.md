@@ -66,19 +66,22 @@ interdependent validations or value transformations.
 
 ## 📋 Table of Contents
 
-- [Features](#-features)
-- [Installation](#-installation)
-- [Usage](#-usage)
+- [YuPy - Python Schema Validation Library](#yupy---python-schema-validation-library)
+  - [Dead simple object schema validation for Python](#dead-simple-object-schema-validation-for-python)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [🔧 Features](#-features)
+  - [📦 Installation](#-installation)
+  - [🚀 Usage](#-usage)
     - [Basic validation](#basic-validation)
     - [Nullability](#nullability)
     - [Arrays](#arrays)
     - [Dictionaries (Mappings)](#dictionaries-mappings)
     - [Union](#union)
-- [Adapters](#-adapters)
+  - [🧩 Adapters](#-adapters)
     - [required](#required)
     - [default](#default)
     - [immutable](#immutable)
-- [API Reference](#-api-reference)
+  - [📘 API Reference](#-api-reference)
     - [Base Schema](#base-schema)
     - [Sized Schema](#sized-schema)
     - [Comparable Schema](#comparable-schema)
@@ -88,10 +91,12 @@ interdependent validations or value transformations.
     - [Mapping Schema](#mapping-schema)
     - [Mixed Schema](#mixed-schema)
     - [Union Schema](#union-schema)
-- [Extending](#-extending)
-- [Running Tests](#-running-tests)
-- [Contributing](#-contributing)
-- [License](#-license)
+  - [🛠 Extending](#-extending)
+    - [Custom Validator](#custom-validator)
+    - [Custom Adapter](#custom-adapter)
+  - [✅ Running Tests](#-running-tests)
+  - [🤝 Contributing](#-contributing)
+  - [📄 License](#-license)
 
 ---
 
@@ -202,7 +207,7 @@ immutable(string()).validate("data")  # -> creates deep copy
 Base class for all schema types providing core validation functionality.
 
 | Method                                                                   | Description                                            |
-|--------------------------------------------------------------------------|--------------------------------------------------------|
+| ------------------------------------------------------------------------ | ------------------------------------------------------ |
 | `nullable() -> Self`                                                     | Makes the schema accept `None` values                  |
 | `not_nullable(message: ErrorMessage = None) -> Self`                     | Explicitly disallows `None` values with custom message |
 | `test(func: ValidatorFunc) -> Self`                                      | Adds a custom validation function                      |
@@ -217,7 +222,7 @@ Base class for all schema types providing core validation functionality.
 Provides size-based validation methods for sequences and collections.
 
 | Method                                                     | Description              |
-|------------------------------------------------------------|--------------------------|
+| ---------------------------------------------------------- | ------------------------ |
 | `length(limit: int, message: ErrorMessage = None) -> Self` | Validates exact length   |
 | `min(limit: int, message: ErrorMessage = None) -> Self`    | Validates minimum length |
 | `max(limit: int, message: ErrorMessage = None) -> Self`    | Validates maximum length |
@@ -229,7 +234,7 @@ Provides size-based validation methods for sequences and collections.
 Provides comparison-based validation methods.
 
 | Method                                                 | Description                                |
-|--------------------------------------------------------|--------------------------------------------|
+| ------------------------------------------------------ | ------------------------------------------ |
 | `le(limit: Any, message: ErrorMessage = None) -> Self` | Validates value ≤ limit                    |
 | `ge(limit: Any, message: ErrorMessage = None) -> Self` | Validates value ≥ limit                    |
 | `lt(limit: Any, message: ErrorMessage = None) -> Self` | Validates value < limit                    |
@@ -244,7 +249,7 @@ Provides comparison-based validation methods.
 Validates string values with text-specific methods.
 
 | Method                                                                                          | Description                                  |
-|-------------------------------------------------------------------------------------------------|----------------------------------------------|
+| ----------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | `email(message: ErrorMessage = None) -> Self`                                                   | Validates email format                       |
 | `url(message: ErrorMessage = None) -> Self`                                                     | Validates URL format                         |
 | `uuid(message: ErrorMessage = None) -> Self`                                                    | Validates UUID format                        |
@@ -260,7 +265,7 @@ Validates string values with text-specific methods.
 Validates numeric values (int, float) with number-specific methods.
 
 | Method                                                                             | Description                                     |
-|------------------------------------------------------------------------------------|-------------------------------------------------|
+| ---------------------------------------------------------------------------------- | ----------------------------------------------- |
 | `positive(message: ErrorMessage = None) -> Self`                                   | Validates number > 0                            |
 | `negative(message: ErrorMessage = None) -> Self`                                   | Validates number < 0                            |
 | `integer(message: ErrorMessage = None) -> Self`                                    | Validates number is integer (no decimals)       |
@@ -273,7 +278,7 @@ Validates numeric values (int, float) with number-specific methods.
 Validates list and tuple values.
 
 | Method                                                                             | Description                                 |
-|------------------------------------------------------------------------------------|---------------------------------------------|
+| ---------------------------------------------------------------------------------- | ------------------------------------------- |
 | `of(schema: Union[ISchema, ISchemaAdapter], message: ErrorMessage = None) -> Self` | Validates all array elements against schema |
 
 ### Mapping Schema
@@ -283,7 +288,7 @@ Validates list and tuple values.
 Validates dictionary/mapping values with object shape validation.
 
 | Method                                                                 | Description                          |
-|------------------------------------------------------------------------|--------------------------------------|
+| ---------------------------------------------------------------------- | ------------------------------------ |
 | `shape(fields: Dict[str, Union[ISchema, ISchemaAdapter]]) -> Self`     | Defines the expected shape/structure |
 | `strict(is_strict: bool = True, message: ErrorMessage = None) -> Self` | Disallows unknown keys when True     |
 
@@ -294,7 +299,7 @@ Validates dictionary/mapping values with object shape validation.
 Validates values of any type with flexible type checking.
 
 | Method                                                                         | Description                                   |
-|--------------------------------------------------------------------------------|-----------------------------------------------|
+| ------------------------------------------------------------------------------ | --------------------------------------------- |
 | `of(type_or_types: _SchemaExpectedType, message: ErrorMessage = None) -> Self` | Validates value is of specified type(s)       |
 | `one_of(items: Iterable, message: ErrorMessage = None) -> Self`                | Validates value is one of the specified items |
 
@@ -305,8 +310,8 @@ Validates values of any type with flexible type checking.
 Validates values that can match one of multiple schemas.
 
 | Method                                                                                        | Description                                                  |
-|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| `one_of(options: List[Union[ISchema, ISchemaAdapter]], message: ErrorMessage = None) -> Self` | Validates value matches at least one of the provided schemas |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `one_of(options: list[Union[ISchema, ISchemaAdapter]], message: ErrorMessage = None) -> Self` | Validates value matches at least one of the provided schemas |
 
 ---
 

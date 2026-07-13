@@ -13,8 +13,10 @@ from yupy.validation_error import ValidationError
 # Patch the locale module for tests that don't explicitly set messages
 @pytest.fixture(autouse=True)
 def reset_locale_for_array_schema_tests():
-    with patch('yupy.locale') as mock_locale_module:
-        mock_locale_module.get_error_message = MagicMock(return_value="Default error message")
+    with patch("yupy.locale") as mock_locale_module:
+        mock_locale_module.get_error_message = MagicMock(
+            return_value="Default error message"
+        )
         mock_locale_module.locale = {
             "type": lambda args: "Value is not of type %r, got %r" % args,
             "array": "invalid array",
@@ -32,7 +34,9 @@ def test_array_schema_creation():
     # Default should be a None
     if schema._of_schema_type is not None:
         assert isinstance(schema._of_schema_type, Schema)
-        assert schema._of_schema_type.nullability is True  # It should be nullable by default for 'of'
+        assert (
+            schema._of_schema_type.nullability is True
+        )  # It should be nullable by default for 'of'
     assert schema._fields == []
 
 
@@ -64,13 +68,19 @@ def test_array_schema_validate_success_no_of():
 def test_array_schema_validate_success_with_of_string():
     schema = ArraySchema().of(StringSchema())
     assert schema.validate(["hello", "world"]) == ["hello", "world"]
-    assert schema.validate(("foo", "bar")) == ("foo", "bar")  # Ensure tuple output for tuple input
+    assert schema.validate(("foo", "bar")) == (
+        "foo",
+        "bar",
+    )  # Ensure tuple output for tuple input
 
 
 def test_array_schema_validate_success_with_of_number():
     schema = ArraySchema().of(NumberSchema())
     assert schema.validate([1, 2, 3]) == [1, 2, 3]
-    assert schema.validate((1.0, 2.5)) == (1.0, 2.5)  # Ensure tuple output for tuple input
+    assert schema.validate((1.0, 2.5)) == (
+        1.0,
+        2.5,
+    )  # Ensure tuple output for tuple input
 
 
 def test_array_schema_validate_empty_list():
@@ -85,7 +95,10 @@ def test_array_schema_validate_type_mismatch_top_level():
         schema.validate("not a list")
     assert excinfo.value.constraint.type == "type"
     assert excinfo.value.invalid_value == "not a list"
-    assert excinfo.value.constraint.format_message == "Value is not of type (<class 'list'>, <class 'tuple'>), got <class 'str'>"
+    assert (
+        excinfo.value.constraint.format_message
+        == "Value is not of type (<class 'list'>, <class 'tuple'>), got <class 'str'>"
+    )
 
 
 def test_array_schema_validate_failure_single_error_abort_early_true():
@@ -93,10 +106,15 @@ def test_array_schema_validate_failure_single_error_abort_early_true():
     data = ["valid", 123, "another_valid"]  # 123 is invalid
     with pytest.raises(ValidationError) as excinfo:
         schema.validate(data, abort_early=True)
-    assert excinfo.value.path == "~/[1]"  # Adjusted to '~.1' as per common path standard
+    assert (
+        excinfo.value.path == "~/[1]"
+    )  # Adjusted to '~.1' as per common path standard
     assert excinfo.value.invalid_value == 123
     assert excinfo.value.constraint.type == "type"
-    assert excinfo.value.constraint.format_message == "Value is not of type <class 'str'>, got <class 'int'>"
+    assert (
+        excinfo.value.constraint.format_message
+        == "Value is not of type <class 'str'>, got <class 'int'>"
+    )
     assert not excinfo.value._errors  # No nested errors when abort_early is True
 
 
@@ -120,13 +138,19 @@ def test_array_schema_validate_failure_multiple_errors_abort_early_false():
     assert error_list[1].path == "~/[1]"  # Adjusted to '~.1'
     assert error_list[1].invalid_value == 123
     assert error_list[1].constraint.type == "type"
-    assert error_list[1].constraint.format_message == "Value is not of type <class 'str'>, got <class 'int'>"
+    assert (
+        error_list[1].constraint.format_message
+        == "Value is not of type <class 'str'>, got <class 'int'>"
+    )
 
     # The third error is for index 2
     assert error_list[2].path == "~/[2]"  # Adjusted to '~.2'
     assert error_list[2].invalid_value is True
     assert error_list[2].constraint.type == "type"
-    assert error_list[2].constraint.format_message == "Value is not of type <class 'str'>, got <class 'bool'>"
+    assert (
+        error_list[2].constraint.format_message
+        == "Value is not of type <class 'str'>, got <class 'bool'>"
+    )
 
 
 def test_array_schema_validate_complex_nested_schema():
@@ -136,14 +160,20 @@ def test_array_schema_validate_complex_nested_schema():
 
     # Success case
     assert array_of_positive_numbers_schema.validate([1, 5, 100]) == [1, 5, 100]
-    assert array_of_positive_numbers_schema.validate((1, 5, 100)) == (1, 5, 100)  # Test tuple input/output
+    assert array_of_positive_numbers_schema.validate((1, 5, 100)) == (
+        1,
+        5,
+        100,
+    )  # Test tuple input/output
 
     # Failure case with negative number, abort_early=True
     with pytest.raises(ValidationError) as excinfo:
         array_of_positive_numbers_schema.validate([1, -5, 100])
     assert excinfo.value.path == "~/[1]"  # Adjusted to '~.1'
     assert excinfo.value.invalid_value == -5
-    assert excinfo.value.constraint.type == "gt"  # 'gt' for greater than 0 from .positive()
+    assert (
+        excinfo.value.constraint.type == "gt"
+    )  # 'gt' for greater than 0 from .positive()
 
     # Failure case with mixed types and negative, abort_early=False
     with pytest.raises(ValidationError) as excinfo:
@@ -156,12 +186,15 @@ def test_array_schema_validate_complex_nested_schema():
     assert error_list[1].invalid_value == -5
     assert error_list[1].constraint.type == "gt"
 
-    assert error_list[2].path == "~/[2]"  # Adjusted to '~.2' # Error for "abc" (type mismatch)
+    assert (
+        error_list[2].path == "~/[2]"
+    )  # Adjusted to '~.2' # Error for "abc" (type mismatch)
     assert error_list[2].invalid_value == "abc"
     assert error_list[2].constraint.type == "type"
 
 
 # --- Tests for inherited SizedSchema methods in ArraySchema ---
+
 
 def test_array_schema_inherited_length_success():
     schema = ArraySchema().length(3)

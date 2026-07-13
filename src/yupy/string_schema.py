@@ -10,7 +10,7 @@ from yupy.isized_schema import SizedSchema
 from yupy.locale import locale, ErrorMessage
 from yupy.validation_error import ValidationError, Constraint
 
-__all__ = ('StringSchema',)
+__all__ = ("StringSchema",)
 
 rUUID_pattern = re.compile(
     r"^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$",
@@ -55,10 +55,15 @@ class StringSchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
         _type (_SchemaExpectedType): The expected Python type for the schema's value.
             Initialized to `str`.
     """
+
     _type: _SchemaExpectedType = field(init=False, default=str)
 
-    def matches(self, regex: re.Pattern, message: ErrorMessage = locale["matches"],
-                exclude_empty: bool = False) -> Self:
+    def matches(
+        self,
+        regex: re.Pattern,
+        message: ErrorMessage = locale["matches"],
+        exclude_empty: bool = False,
+    ) -> Self:
         """
         Adds a validation rule to ensure the string matches a given regular expression pattern.
 
@@ -79,7 +84,9 @@ class StringSchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
                 return
 
             if not re.match(regex, x):
-                raise ValidationError(Constraint("matches", message, regex.pattern), invalid_value=x)
+                raise ValidationError(
+                    Constraint("matches", message, regex.pattern), invalid_value=x
+                )
 
         return self.test(_)
 
@@ -145,7 +152,7 @@ class StringSchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
         return self.test(_)
 
     # # FIXME
-    # def datetime(self, message: ErrorMessage = locale["datetime"], precision: Optional[Literal[0, 3, 6]] = None,
+    # def datetime(self, message: ErrorMessage = locale["datetime"], precision: Literal[0, 3, 6] | None = None,
     #              allow_offset: bool = True) -> Self:
     #     """
     #     Adds a validation rule to ensure the string is a valid ISO 8601 datetime.
@@ -156,7 +163,7 @@ class StringSchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
     #     Args:
     #         message (ErrorMessage): The error message to use if the validation fails.
     #             Defaults to the locale-defined message for "datetime".
-    #         precision (Optional[Literal[0, 3, 6]]): If specified, validates the fractional
+    #         precision (Literal[0, 3, 6] | None): If specified, validates the fractional
     #             second precision of the datetime string.
     #             - `0`: No fractional seconds (e.g., `YYYY-MM-DDTHH:MM:SS`).
     #             - `3`: Milliseconds precision (e.g., `YYYY-MM-DDTHH:MM:SS.mmm`).

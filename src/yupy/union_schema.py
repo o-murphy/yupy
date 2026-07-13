@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, List, Union, Tuple
+from typing import Any
 
 from typing_extensions import Self
 
@@ -10,9 +10,9 @@ from yupy.locale import locale, ErrorMessage
 from yupy.util.concat_path import concat_path
 from yupy.validation_error import Constraint, ValidationError
 
-__all__ = ('UnionSchema',)
+__all__ = ("UnionSchema",)
 
-UnionOptionsType = Union[List[Union[ISchema, ISchemaAdapter]], Tuple[Union[ISchema, ISchemaAdapter], ...]]
+UnionOptionsType = list[ISchema | ISchemaAdapter] | tuple[ISchema | ISchemaAdapter, ...]
 
 
 @dataclass
@@ -31,10 +31,13 @@ class UnionSchema(EqualityComparableSchema):
         _options (UnionOptionsType): A list or tuple of `ISchema` or `ISchemaAdapter`
             instances, representing the alternative schemas for validation.
     """
+
     _type: _SchemaExpectedType = field(init=False, default=object)
     _options: UnionOptionsType = field(init=False, default_factory=list)
 
-    def one_of(self, options: UnionOptionsType, message: ErrorMessage = locale["one_of"]) -> Self:
+    def one_of(
+        self, options: UnionOptionsType, message: ErrorMessage = locale["one_of"]
+    ) -> Self:
         """
         Specifies the set of alternative schemas that the value must conform to.
 
@@ -58,11 +61,15 @@ class UnionSchema(EqualityComparableSchema):
         """
         for schema in options:
             if not isinstance(schema, ISchema):
-                raise TypeError("each union schema must be an instance of ISchema or ISchemaAdapter")
+                raise TypeError(
+                    "each union schema must be an instance of ISchema or ISchemaAdapter"
+                )
         self._options = options
         return self
 
-    def validate(self, value: Any = None, abort_early: bool = True, path: str = "~") -> Any:
+    def validate(
+        self, value: Any = None, abort_early: bool = True, path: str = "~"
+    ) -> Any:
         """
         Validates the given value against the union's alternative schemas.
 
@@ -89,10 +96,13 @@ class UnionSchema(EqualityComparableSchema):
         value = super().validate(value, abort_early, path)
         if value is None and self._nullability:
             return None
-        return self._validate_union(value, abort_early, path)  # Convert tuple to list for iteration
+        return self._validate_union(
+            value, abort_early, path
+        )  # Convert tuple to list for iteration
 
-    def _validate_union(self, value: Any, abort_early: bool = True,
-                        path: str = "~") -> Any:
+    def _validate_union(
+        self, value: Any, abort_early: bool = True, path: str = "~"
+    ) -> Any:
         """
         Internal method to iterate through alternative schemas and attempt validation.
 
@@ -116,7 +126,7 @@ class UnionSchema(EqualityComparableSchema):
             ValidationError: If the value fails to validate against all alternative schemas.
         """
         matching_value = value
-        errs: List[ValidationError] = []
+        errs: list[ValidationError] = []
         for i, opt in enumerate(self._options):
             path_ = concat_path(path, i)
             try:
@@ -127,11 +137,15 @@ class UnionSchema(EqualityComparableSchema):
                 errs.append(err)
 
         # If we reach here and no match was found, raise a Union-specific error
-        if len(errs) >= len(self._options):  # This condition will always be true if no option matched
+        if len(errs) >= len(
+            self._options
+        ):  # This condition will always be true if no option matched
             raise ValidationError(
-                Constraint('one_of', locale["one_of"], path),
+                Constraint("one_of", locale["one_of"], path),
                 # The path passed to the constraint should reflect the current union path
-                path, errs, invalid_value=value
+                path,
+                errs,
+                invalid_value=value,
             )
         # This part should ideally not be reached if no option matched and errs were collected
         return matching_value  # Fallback,

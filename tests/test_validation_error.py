@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import Any
 from unittest.mock import patch
 
 from yupy.validation_error import ValidationError, Constraint, _EMPTY_MESSAGE_
@@ -14,8 +14,9 @@ def test_constraint_init_with_type_and_message():
 def test_constraint_init_with_type_and_no_message():
     # Patch get_error_message where it is used by the Constraint class,
     # i.e., within the yupy.validation_error module's namespace, as it's imported at the top.
-    with patch('yupy.validation_error.get_error_message',
-               return_value="Default error message") as mock_get_error_message:
+    with patch(
+        "yupy.validation_error.get_error_message", return_value="Default error message"
+    ) as mock_get_error_message:
         constraint = Constraint("test_type")
         assert constraint.type == "test_type"
         assert constraint.args == ()
@@ -32,7 +33,7 @@ def test_constraint_init_with_args():
 
 
 def test_constraint_format_message_callable():
-    def custom_message_formatter(args: List[Any]) -> str:
+    def custom_message_formatter(args: list[Any]) -> str:
         return f"Value {args[0]} is not equal to {args[1]}"
 
     constraint = Constraint("equality", custom_message_formatter, 5, 10)
@@ -68,7 +69,9 @@ def test_validation_error_init_with_nested_errors():
     nested_error2 = ValidationError(constraint=nested_constraint2, path="data.value")
 
     main_constraint = Constraint("composite", "Multiple issues")
-    main_error = ValidationError(constraint=main_constraint, path="data", errors=[nested_error1, nested_error2])
+    main_error = ValidationError(
+        constraint=main_constraint, path="data", errors=[nested_error1, nested_error2]
+    )
 
     assert main_error._errors == [nested_error1, nested_error2]
     assert main_error.path == "data"
@@ -77,20 +80,22 @@ def test_validation_error_init_with_nested_errors():
 def test_validation_error_str_representation():
     constraint = Constraint("invalid_format", "Incorrect format")
     error = ValidationError(constraint=constraint, path="user.email")
-    assert str(
-        error) == ("(path='user.email', "
-                   "constraint=Constraint(type='invalid_format', args=(), origin=None), "
-                   "message='Incorrect format')")
+    assert str(error) == (
+        "(path='user.email', "
+        "constraint=Constraint(type='invalid_format', args=(), origin=None), "
+        "message='Incorrect format')"
+    )
 
 
 def test_validation_error_repr_representation():
     constraint = Constraint("null_value", "Cannot be null")
     error = ValidationError(constraint=constraint, path="item.id")
     print(repr(error))
-    assert repr(
-        error) == ("ValidationError(path='item.id', "
-                   "constraint=Constraint(type='null_value', args=(), origin=None), "
-                   "message='Cannot be null')")
+    assert repr(error) == (
+        "ValidationError(path='item.id', "
+        "constraint=Constraint(type='null_value', args=(), origin=None), "
+        "message='Cannot be null')"
+    )
 
 
 def test_validation_error_errors_property_single_error():
@@ -110,7 +115,9 @@ def test_validation_error_errors_property_nested_errors():
     e3 = ValidationError(c3, "p3", errors=[e1, e2])
     c4 = Constraint("c4", "m4")
     e4 = ValidationError(c4, "p4")
-    main_error = ValidationError(Constraint("main", "main"), "main_path", errors=[e3, e4])
+    main_error = ValidationError(
+        Constraint("main", "main"), "main_path", errors=[e3, e4]
+    )
 
     all_errors = list(main_error.errors)
     assert len(all_errors) == 5
