@@ -9,7 +9,7 @@
 [![Test](https://github.com/o-murphy/yupy/actions/workflows/pytest.yml/badge.svg)](https://github.com/o-murphy/yupy/actions/workflows/pytest.yml)
 [![Ruff](https://github.com/o-murphy/yupy/actions/workflows/mypy.yml/badge.svg)](https://github.com/o-murphy/yupy/actions/workflows/mypy.yml)
 [![Mypy](https://github.com/o-murphy/yupy/actions/workflows/ruff.yml/badge.svg)](https://github.com/o-murphy/yupy/actions/workflows/ruff.yml)
-[![coverage]][coverage]
+[![coverage]][CodecovUrl]
 [![downloads]][pepy]
 [![downloads/month]][pepy]
 [![Made in Ukraine]][SWUBadge]
@@ -48,7 +48,10 @@ https://pepy.tech/project/yupy
 https://img.shields.io/pypi/pyversions/yupy?style=flat-square
 
 [coverage]:
-./coverage.svg
+https://codecov.io/gh/o-murphy/yupy/graph/badge.svg
+
+[CodecovUrl]:
+https://codecov.io/gh/o-murphy/yupy
 
 [Made in Ukraine]:
 https://img.shields.io/badge/made_in-Ukraine-ffd700.svg?labelColor=0057b7&style=flat-square
