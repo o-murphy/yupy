@@ -57,6 +57,7 @@ extend-exclude = ["__init__.py"]
 dev = [
     "mypy>=2.2.0",
     "orjson>=3.10.18",
+    "pre-commit>=4.6.1",
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
     "ruff>=0.15.22",
