@@ -5,7 +5,7 @@ from typing_extensions import Self
 
 from yupy.adapters import ISchemaAdapter
 from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
-from yupy.ischema import _SchemaExpectedType, ISchema
+from yupy.ischema import ISchema, _SchemaExpectedType
 from yupy.isized_schema import SizedSchema
 from yupy.locale import locale
 from yupy.util.concat_path import concat_path
@@ -136,7 +136,7 @@ class ArraySchema(SizedSchema, ComparableSchema, EqualityComparableSchema):
                 validated_result.append(validated_item)
             except ValidationError as err:
                 if abort_early:
-                    raise err
+                    raise
                 else:
                     errs.append(err)
                     validated_result.append(item)

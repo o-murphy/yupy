@@ -5,8 +5,8 @@ from typing_extensions import Self
 
 from yupy.adapters import ISchemaAdapter
 from yupy.icomparable_schema import EqualityComparableSchema
-from yupy.ischema import _SchemaExpectedType, ISchema
-from yupy.locale import locale, ErrorMessage
+from yupy.ischema import ISchema, _SchemaExpectedType
+from yupy.locale import ErrorMessage, locale
 from yupy.util.concat_path import concat_path
 from yupy.validation_error import Constraint, ValidationError
 

@@ -1,11 +1,11 @@
 from collections.abc import Callable
-from typing import Literal, TypedDict, TypeAlias, Any
+from typing import Any, Literal, TypeAlias, TypedDict
 
 __all__ = (
+    "ErrorMessage",
+    "get_error_message",
     "locale",
     "set_locale",
-    "get_error_message",
-    "ErrorMessage",
 )
 
 ErrorMessage: TypeAlias = str | Callable[[Any | list[Any]], str]
@@ -102,11 +102,11 @@ Literal type defining all valid keys for the `locale` dictionary.
 """
 
 locale: Locale = {
-    "const": lambda args: "Value is not match the const %r" % args,
-    "type": lambda args: "Value is not of type %r, got %r" % args,
-    "min": lambda args: "Min length must be %r" % args,
-    "max": lambda args: "Max length must be %r" % args,
-    "length": lambda args: "Length must be %r" % args,
+    "const": lambda args: f"Value is not match the const {args[0]!r}",
+    "type": lambda args: f"Value is not of type {args[0]!r}, got {args[1]!r}",
+    "min": lambda args: f"Min length must be {args[0]!r}",
+    "max": lambda args: f"Max length must be {args[0]!r}",
+    "length": lambda args: f"Length must be {args[0]!r}",
     "uppercase": "Value must be an uppercase string",
     "lowercase": "Value must be a lowercase string",
     "required": "Value is required",
@@ -117,12 +117,12 @@ locale: Locale = {
     "email": "Value must be a valid email",
     "url": "Value must be a valid URL",
     "uuid": "Value must be a valid UUID",
-    "le": lambda args: "Value must be less or equal to %r" % args,
-    "ge": lambda args: "Value must be greater or equal to %r" % args,
-    "lt": lambda args: "Value must be less than %r" % args,
-    "gt": lambda args: "Value must be greater than %r" % args,
-    "eq": lambda args: "Value must be equal to %r" % args,
-    "ne": lambda args: "Value must be not equal to %r" % args,
+    "le": lambda args: f"Value must be less or equal to {args[0]!r}",
+    "ge": lambda args: f"Value must be greater or equal to {args[0]!r}",
+    "lt": lambda args: f"Value must be less than {args[0]!r}",
+    "gt": lambda args: f"Value must be greater than {args[0]!r}",
+    "eq": lambda args: f"Value must be equal to {args[0]!r}",
+    "ne": lambda args: f"Value must be not equal to {args[0]!r}",
     "positive": "Value must be positive, a.g. > 0",
     "negative": "Value must be positive, a.g. < 0",
     "integer": "Value must be valid 'int', got 'float'",
@@ -130,11 +130,11 @@ locale: Locale = {
     "datetime": "Value must be a valid ISO 8601 datetime",
     "array": "Invalid array",
     "mapping": "Invalid mapping",
-    "multiple_of": lambda args: "Value must be a multiple of %r" % args,
+    "multiple_of": lambda args: f"Value must be a multiple of {args[0]!r}",
     "strict": lambda args: (
-        "Object contains unknown keys: %s" % (", ".join(map(repr, args)),)
+        f"Object contains unknown keys: {', '.join(map(repr, args))}"
     ),
-    "one_of": lambda args: "Must be one of %r" % args,
+    "one_of": lambda args: f"Must be one of {args[0]!r}",
     "json": lambda args: "Value must be a valid JSON",
     "undefined": "Undefined validation error",
 }

@@ -1,13 +1,13 @@
+from collections.abc import Generator
 from dataclasses import dataclass, field
 from typing import Any
-from collections.abc import Generator
 
-from yupy.locale import get_error_message, ErrorMessage
+from yupy.locale import ErrorMessage, get_error_message
 
 __all__ = (
-    "ValidationError",
-    "Constraint",
     "_EMPTY_MESSAGE_",
+    "Constraint",
+    "ValidationError",
 )
 
 _EMPTY_MESSAGE_: ErrorMessage = ""
@@ -145,10 +145,9 @@ class ValidationError(ValueError):
         Returns:
             str: A string in the format "(path='...', constraint=Constraint(...), message='...')".
         """
-        return "(path=%r, constraint=%r, message=%r)" % (
-            self.path,
-            self.constraint,
-            self.constraint.format_message,
+        return (
+            f"(path={self.path!r}, constraint={self.constraint!r}, "
+            f"message={self.constraint.format_message!r})"
         )
 
     def __repr__(self) -> str:
@@ -158,7 +157,7 @@ class ValidationError(ValueError):
         Returns:
             str: A string in the format "ValidationError(path='...', constraint=Constraint(...), message='...')".
         """
-        return "ValidationError%s" % self.__str__()
+        return f"ValidationError{self.__str__()}"
 
     @property
     def errors(self) -> Generator["ValidationError", None, None]:
@@ -183,7 +182,7 @@ class ValidationError(ValueError):
         Returns:
             str: A string in the format "'path':'formatted_constraint_message'".
         """
-        return "%r:%s" % (self.path, self.constraint.format_message)
+        return f"{self.path!r}:{self.constraint.format_message}"
 
     @property
     def messages(self) -> Generator[property | str, None, None]:

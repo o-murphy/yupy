@@ -22,6 +22,6 @@ def concat_path(path: str, item: str | int) -> str:
     if isinstance(item, str):
         if not path:
             return item
-        return "/".join((path, item))
+        return f"{path}/{item}"
     else:
         raise TypeError("Unsupported item type")

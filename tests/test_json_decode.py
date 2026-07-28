@@ -1,7 +1,7 @@
 import json
 import warnings
 from json import JSONDecodeError
-from typing import Any
+from typing import Any, ClassVar
 from unittest.mock import patch
 
 import pytest
@@ -99,8 +99,8 @@ class TestLoadsFunction:
 
     json_data_str = '{"name": "Test", "value": 123, "is_active": true}'
     json_data_bytes = b'{"id": 1, "data": "binary_test"}'
-    expected_dict_str = {"name": "Test", "value": 123, "is_active": True}
-    expected_dict_bytes = {"id": 1, "data": "binary_test"}
+    expected_dict_str: ClassVar = {"name": "Test", "value": 123, "is_active": True}
+    expected_dict_bytes: ClassVar = {"id": 1, "data": "binary_test"}
 
     @pytest.mark.parametrize("parser_type", ["json", "orjson"])
     def test_loads_simple_string_data(self, parser_type):

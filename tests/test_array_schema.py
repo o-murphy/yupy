@@ -1,5 +1,5 @@
 # test_array_schema.py
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -18,11 +18,11 @@ def reset_locale_for_array_schema_tests():
             return_value="Default error message"
         )
         mock_locale_module.locale = {
-            "type": lambda args: "Value is not of type %r, got %r" % args,
+            "type": lambda args: f"Value is not of type {args[0]!r}, got {args[1]!r}",
             "array": "invalid array",
-            "min": lambda args: "Min length must be %r" % args[0],
-            "max": lambda args: "Max length must be %r" % args[0],
-            "length": lambda args: "Length must be %r" % args[0],
+            "min": lambda args: f"Min length must be {args[0]!r}",
+            "max": lambda args: f"Max length must be {args[0]!r}",
+            "length": lambda args: f"Length must be {args[0]!r}",
             "nullable": "Value can't be null",  # Added for nullability check
         }
         yield mock_locale_module

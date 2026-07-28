@@ -40,7 +40,7 @@ def test_number_schema_default_type_check_failure():
         schema.validate("abc")
     assert excinfo.value.constraint.type == "type"
     assert excinfo.value.invalid_value == "abc"
-    expected_message = locale["type"](((float, int), type("abc")))
+    expected_message = locale["type"](((float, int), str))
     assert excinfo.value.constraint.format_message == expected_message
 
 

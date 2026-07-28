@@ -1,24 +1,24 @@
 from copy import deepcopy
 from json import JSONDecodeError
-from typing import Any, TypeVar, Protocol, runtime_checkable
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
 from typing_extensions import Self
 
 from yupy._json_decode import SUPPORTED_JSON_PARSER, loads
 from yupy.ischema import ISchema
-from yupy.locale import locale, ErrorMessage
-from yupy.validation_error import ValidationError, Constraint, _EMPTY_MESSAGE_
+from yupy.locale import ErrorMessage, locale
+from yupy.validation_error import _EMPTY_MESSAGE_, Constraint, ValidationError
 
 _REQUIRED_UNDEFINED_ = TypeVar("_REQUIRED_UNDEFINED_")
 
 __all__ = (
+    "_REQUIRED_UNDEFINED_",
     "ISchemaAdapter",
     "SchemaAdapter",
-    "SchemaJsonAdapter",
     "SchemaDefaultAdapter",
-    "SchemaRequiredAdapter",
     "SchemaImmutableAdapter",
-    "_REQUIRED_UNDEFINED_",
+    "SchemaJsonAdapter",
+    "SchemaRequiredAdapter",
 )
 
 
@@ -210,9 +210,9 @@ class SchemaDefaultAdapter(SchemaAdapter):
             value = self._default
         try:
             return super().validate(value, abort_early, path)
-        except ValidationError as e:
+        except ValidationError:
             if not self._ensure:
-                raise e
+                raise
         return self._default
 
 

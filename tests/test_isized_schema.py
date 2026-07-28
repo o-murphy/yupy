@@ -1,6 +1,6 @@
 import pytest
 
-from yupy.isized_schema import SizedSchema, ISizedSchema
+from yupy.isized_schema import ISizedSchema, SizedSchema
 from yupy.locale import locale
 from yupy.schema import Schema
 from yupy.validation_error import ValidationError

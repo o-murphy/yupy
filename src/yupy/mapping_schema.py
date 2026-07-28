@@ -6,10 +6,10 @@ from typing_extensions import Self
 
 from yupy.adapters import _REQUIRED_UNDEFINED_, ISchemaAdapter
 from yupy.icomparable_schema import EqualityComparableSchema
-from yupy.ischema import _SchemaExpectedType, ISchema
-from yupy.locale import locale, ErrorMessage
+from yupy.ischema import ISchema, _SchemaExpectedType
+from yupy.locale import ErrorMessage, locale
 from yupy.util.concat_path import concat_path
-from yupy.validation_error import ValidationError, Constraint
+from yupy.validation_error import Constraint, ValidationError
 
 __all__ = ("MappingSchema",)
 
@@ -61,7 +61,7 @@ class MappingSchema(EqualityComparableSchema):
         """
         if not isinstance(fields, dict):
             raise TypeError("Shape definition must be a dictionary.")
-        for key, item in fields.items():
+        for item in fields.values():
             # TODO: possibly need check if keys are immutable
             # if not isinstance(key, (int, str, Enum)):
             #     raise TypeError("each shape key must be an instance of int or str")
@@ -177,7 +177,7 @@ class MappingSchema(EqualityComparableSchema):
                 if abort_early:
                     # When abort_early is True, re-raise the original error with the correct path and invalid_value
                     # The original err.path is already correct
-                    raise err
+                    raise
                 errs.append(err)  # Append the original error to collect all
 
         if errs:

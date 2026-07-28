@@ -1,6 +1,6 @@
-from types import UnionType
-from typing import Protocol, TypeVar, Any, TypeAlias, runtime_checkable
 from collections.abc import Callable
+from types import UnionType
+from typing import Any, Protocol, TypeAlias, TypeVar, runtime_checkable
 
 from typing_extensions import Self
 
