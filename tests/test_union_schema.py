@@ -1,11 +1,13 @@
 # test_union_schema.py
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from yupy.locale import (
-    locale as yupy_actual_locale,
     get_error_message as yupy_actual_get_error_message,
+)
+from yupy.locale import (
+    locale as yupy_actual_locale,
 )
 from yupy.number_schema import NumberSchema
 from yupy.schema import Schema

@@ -1,7 +1,7 @@
 from typing import Any
 from unittest.mock import patch
 
-from yupy.validation_error import ValidationError, Constraint, _EMPTY_MESSAGE_
+from yupy.validation_error import _EMPTY_MESSAGE_, Constraint, ValidationError
 
 
 def test_constraint_init_with_type_and_message():

@@ -1,17 +1,16 @@
 import math
 from dataclasses import dataclass, field
-from typing import TypeAlias, TypeVar, Literal
+from typing import Literal, TypeAlias
 
 from typing_extensions import Self
 
 from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType
-from yupy.locale import locale, ErrorMessage
-from yupy.validation_error import ValidationError, Constraint
+from yupy.locale import ErrorMessage, locale
+from yupy.validation_error import Constraint, ValidationError
 
 __all__ = ("NumberSchema",)
 
-_T = TypeVar("_T")
 _NumberType: TypeAlias = int | float
 
 RoundingMethod = Literal["ceil", "floor", "round", "trunc"]
@@ -132,13 +131,13 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
             case "trunc":
                 self._transforms.append(math.trunc)
             case _:  # Default case for unsupported methods
-                raise ValueError("round method should be one of %s" % valid_methods)
+                raise ValueError(f"round method should be one of {valid_methods}")
 
         return self
 
     def multiple_of(
         self,
-        multiplier: int | float,
+        multiplier: float,
         message: ErrorMessage = locale["multiple_of"],
     ) -> Self:
         """
@@ -154,7 +153,7 @@ class NumberSchema(ComparableSchema, EqualityComparableSchema):
             Self: The schema instance, allowing for method chaining.
         """
 
-        def _(x: int | float) -> None:
+        def _(x: float) -> None:
             if x % multiplier != 0:
                 raise ValidationError(
                     Constraint("multiple_of", message, multiplier), invalid_value=x

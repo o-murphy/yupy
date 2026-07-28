@@ -1,10 +1,10 @@
 import pytest
 
 from yupy.icomparable_schema import (
-    EqualityComparableSchema,
     ComparableSchema,
-    IEqualityComparableSchema,
+    EqualityComparableSchema,
     IComparableSchema,
+    IEqualityComparableSchema,
 )
 from yupy.locale import locale
 from yupy.schema import Schema

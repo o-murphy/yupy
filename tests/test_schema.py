@@ -4,7 +4,7 @@ import pytest
 
 from yupy.locale import locale
 from yupy.schema import Schema
-from yupy.validation_error import ValidationError, Constraint
+from yupy.validation_error import Constraint, ValidationError
 
 
 # Fixture to ensure isolation of tests that might modify the global 'locale'

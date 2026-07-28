@@ -1,4 +1,4 @@
-from yupy import string, number, array, mapping, required, ValidationError
+from yupy import ValidationError, array, mapping, number, required, string
 
 if __name__ == "__main__":
     s = string().max(5).min(2).lowercase()

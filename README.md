@@ -156,10 +156,7 @@ array().of(string().min(2)).min(1).validate(["ok", "yes"])
 ```python
 from yupy import mapping
 
-user_schema = mapping().shape({
-    "name": string().min(3),
-    "age": number().ge(18)
-})
+user_schema = mapping().shape({"name": string().min(3), "age": number().ge(18)})
 ```
 
 ### Union

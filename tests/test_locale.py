@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from yupy.locale import locale, set_locale, get_error_message, ErrorMessage
+from yupy.locale import ErrorMessage, get_error_message, locale, set_locale
 
 
 # Helper to reset locale after tests to avoid side effects
@@ -29,7 +29,7 @@ def test_set_locale_with_new_values():
     new_messages = {
         "new_key": "This is a new message",
         "undefined": "Custom undefined message",
-        "const": lambda args: f"Custom const message for {args[0]}",  #
+        "const": lambda args: f"Custom const message for {args[0]}",
     }
     set_locale(new_messages)
 

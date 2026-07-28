@@ -1,12 +1,12 @@
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from typing_extensions import Self
 
 from yupy.adapters import _REQUIRED_UNDEFINED_
 from yupy.ischema import TransformFunc, ValidatorFunc, _SchemaExpectedType
-from yupy.locale import locale, ErrorMessage
-from yupy.validation_error import ValidationError, Constraint
+from yupy.locale import ErrorMessage, locale
+from yupy.validation_error import Constraint, ValidationError
 
 __all__ = ("Schema",)
 

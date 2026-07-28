@@ -1,12 +1,12 @@
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
-from collections.abc import Iterable
 
 from typing_extensions import Self
 
 from yupy.icomparable_schema import EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType
-from yupy.locale import locale, ErrorMessage
+from yupy.locale import ErrorMessage, locale
 from yupy.validation_error import Constraint, ValidationError
 
 __all__ = ("MixedSchema",)

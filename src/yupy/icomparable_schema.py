@@ -1,17 +1,16 @@
-from typing import Protocol, Any, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from typing_extensions import Self
 
-from yupy.locale import ErrorMessage
-from yupy.locale import locale
+from yupy.locale import ErrorMessage, locale
 from yupy.schema import Schema
-from yupy.validation_error import ValidationError, Constraint
+from yupy.validation_error import Constraint, ValidationError
 
 __all__ = (
-    "IEqualityComparableSchema",
-    "IComparableSchema",
-    "EqualityComparableSchema",
     "ComparableSchema",
+    "EqualityComparableSchema",
+    "IComparableSchema",
+    "IEqualityComparableSchema",
 )
 
 

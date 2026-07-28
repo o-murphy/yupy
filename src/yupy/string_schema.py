@@ -1,5 +1,5 @@
 import re
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 from datetime import date
 
 from typing_extensions import Self
@@ -7,8 +7,8 @@ from typing_extensions import Self
 from yupy.icomparable_schema import ComparableSchema, EqualityComparableSchema
 from yupy.ischema import _SchemaExpectedType
 from yupy.isized_schema import SizedSchema
-from yupy.locale import locale, ErrorMessage
-from yupy.validation_error import ValidationError, Constraint
+from yupy.locale import ErrorMessage, locale
+from yupy.validation_error import Constraint, ValidationError
 
 __all__ = ("StringSchema",)
 

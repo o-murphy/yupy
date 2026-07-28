@@ -1,12 +1,14 @@
 # test_mapping_schema.py
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from yupy.adapters import SchemaRequiredAdapter, _REQUIRED_UNDEFINED_
+from yupy.adapters import _REQUIRED_UNDEFINED_, SchemaRequiredAdapter
+from yupy.locale import (
+    get_error_message as yupy_actual_get_error_message,
+)
 from yupy.locale import (
     locale as yupy_actual_locale,
-    get_error_message as yupy_actual_get_error_message,
 )
 from yupy.mapping_schema import MappingSchema
 from yupy.number_schema import NumberSchema
