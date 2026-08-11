@@ -44,6 +44,7 @@ class ISchemaAdapter(Protocol):
     # def __init__(self, schema: ISchema | 'ISchemaAdapter',
     #              message: ErrorMessage = _EMPTY_MESSAGE_) -> None: ...
 
+
     @property
     def schema(self) -> "ISchema | ISchemaAdapter":
         """
