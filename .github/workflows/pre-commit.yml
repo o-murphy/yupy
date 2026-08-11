@@ -50,18 +50,24 @@ jobs:
         if: steps.diff.outputs.changed == 'false' && steps.first_run.outcome == 'failure'
         run: exit 1
 
+      - name: Fail (changes produced, but not on a pull_request)
+        if: steps.diff.outputs.changed == 'true' && github.event_name != 'pull_request'
+        run: |
+          echo "pre-commit modified files, but auto-commit only runs on pull_request events."
+          exit 1
+
       - name: Re-run pre-commit after auto-fixes
         id: verify_run
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.diff.outputs.changed == 'true' && github.event_name == 'pull_request'
         continue-on-error: true
         run: pre-commit run --all-files --show-diff-on-failure
 
       - name: Fail (issues remain after auto-fix)
-        if: steps.diff.outputs.changed == 'true' && steps.verify_run.outcome == 'failure'
+        if: steps.diff.outputs.changed == 'true' && github.event_name == 'pull_request' && steps.verify_run.outcome == 'failure'
         run: exit 1
 
       - name: Commit and push auto-fixes
-        if: steps.diff.outputs.changed == 'true' && steps.verify_run.outcome == 'success'
+        if: steps.diff.outputs.changed == 'true' && github.event_name == 'pull_request' && steps.verify_run.outcome == 'success'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

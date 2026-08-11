@@ -53,6 +53,7 @@ class ISchemaAdapter(Protocol):
             ISchema | 'ISchemaAdapter': The wrapped schema.
         """
 
+
     def validate(
         self, value: Any = None, abort_early: bool = True, path: str = "~"
     ) -> Any:
